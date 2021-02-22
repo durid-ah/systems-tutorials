@@ -1,29 +1,13 @@
 use std::io::{stdin, stdout, Write};
 use std::process;
+use statement_handler::{
+    Statement,
+    StatementType,
+    prepare_statement,
+};
 
-enum StatementType {
-    InsertStatement,
-    SelectStatement
-}
+mod statement_handler;
 
-struct Statement {
-    st_type: StatementType 
-}
-
-fn prepare_statement(command: &String, statement: &mut Statement) -> Result<(), String> {
-    let operation = &command[0..6];
-    match operation {
-        "select" => {
-            statement.st_type = StatementType::SelectStatement;
-            return Ok(())
-        },
-        "insert" => {
-            statement.st_type = StatementType::InsertStatement;
-            return Ok(())
-        },
-        _ => return Err(String::from("Unrecognized Statement"))
-    }
-}
 
 fn parse_meta_command(user_input: &String) {
     let input = user_input.trim_end();
@@ -47,6 +31,10 @@ fn main() {
             parse_meta_command(&input);
             continue;
         }
+
+        let s =  Statement{ 
+            st_type: statement_handler::StatementType::InsertStatement,
+        };
     }
     
 }
