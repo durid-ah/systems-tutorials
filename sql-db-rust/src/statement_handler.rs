@@ -1,12 +1,19 @@
 /// The type of statement requested by the user
 pub enum StatementType {
    InsertStatement,
-   SelectStatement
+   SelectStatement,
+   None
 }
 
 /// The syruct containing the statement data
 pub struct Statement {
    pub st_type: StatementType 
+}
+
+impl Statement {
+    fn new() -> Statement {
+        Statement{st_type: StatementType::None}
+    }
 }
 
 pub fn prepare_statement(command: &String, statement: &mut Statement) -> Result<(), String> {
@@ -22,4 +29,16 @@ pub fn prepare_statement(command: &String, statement: &mut Statement) -> Result<
        },
        _ => return Err(String::from("Unrecognized Statement"))
    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_select() {
+        let stmt_string = String::from("selec");
+        let mut stmt = Statement::new();
+        let res = prepare_statement(&stmt_string, &mut stmt);
+    }
 }
