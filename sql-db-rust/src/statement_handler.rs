@@ -1,9 +1,10 @@
-
+/// The type of statement requested by the user
 pub enum StatementType {
    InsertStatement,
    SelectStatement
 }
 
+/// The syruct containing the statement data
 pub struct Statement {
    pub st_type: StatementType 
 }

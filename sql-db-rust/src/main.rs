@@ -33,7 +33,7 @@ fn main() {
         }
 
         let s =  Statement{ 
-            st_type: statement_handler::StatementType::InsertStatement,
+            st_type: StatementType::InsertStatement,
         };
     }
     
