@@ -1,12 +1,13 @@
 use std::io::{stdin, stdout, Write};
 use std::process;
+use statement_enums::StatementType;
 use statement_handler::{
     Statement,
-    StatementType,
     prepare_statement,
 };
 
 mod statement_handler;
+mod statement_enums;
 
 
 fn parse_meta_command(user_input: &String) {
@@ -33,7 +34,7 @@ fn main() {
         }
 
         let s =  Statement{ 
-            st_type: StatementType::InsertStatement,
+            st_type: StatementType::None,
         };
     }
     
