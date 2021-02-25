@@ -1,9 +1,4 @@
-/// The type of statement requested by the user
-pub enum StatementType {
-   InsertStatement,
-   SelectStatement,
-   None
-}
+use super::statement_enums::{StatementType, PrepareResult};
 
 /// The syruct containing the statement data
 pub struct Statement {
@@ -16,29 +11,49 @@ impl Statement {
     }
 }
 
-pub fn prepare_statement(command: &String, statement: &mut Statement) -> Result<(), String> {
+pub fn prepare_statement(command: &String, statement: &mut Statement) -> PrepareResult {
+   if command.len() < 6 {
+      return PrepareResult::UnrecognizedStatement
+   }
    let operation = &command[0..6];
    match operation {
-       "select" => {
-           statement.st_type = StatementType::SelectStatement;
-           return Ok(())
-       },
-       "insert" => {
-           statement.st_type = StatementType::InsertStatement;
-           return Ok(())
-       },
-       _ => return Err(String::from("Unrecognized Statement"))
+      "select" => {
+         statement.st_type = StatementType::SelectStatement;
+         return PrepareResult::Success;
+      },
+      "insert" => {
+         statement.st_type = StatementType::InsertStatement;
+         return PrepareResult::Success;
+      },
+      _ => return PrepareResult::UnrecognizedStatement
    }
 }
 
 #[cfg(test)]
 mod test {
-    use super::*;
+   use super::*;
+   use super::super::statement_enums::PrepareResult::{
+      Success,
+      UnrecognizedStatement
+   };
+   
+   #[test]
+   fn test_stmt_shorter_than_6_chars() {
+     let stmt_string = String::from("selec");
+     let mut stmt = Statement::new();
+     match prepare_statement(&stmt_string, &mut stmt) {
+        UnrecognizedStatement => assert!(true),
+        _ => assert!(false, "a short statement must return unrecognized statement")
+     }
+   }
 
-    #[test]
-    fn test_select() {
-        let stmt_string = String::from("selec");
-        let mut stmt = Statement::new();
-        let res = prepare_statement(&stmt_string, &mut stmt);
-    }
+   #[test]
+   fn test_select_stmt() {
+      let stmt_string = String::from("select");
+      let mut stmt = Statement::new();
+      match prepare_statement(&stmt_string, &mut stmt) {
+         Success => assert!(true),
+         _ => assert!(false, "a short statement must return success")
+      }
+   }
 }
