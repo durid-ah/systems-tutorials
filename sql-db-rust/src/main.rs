@@ -4,6 +4,7 @@ use statement_enums::StatementType;
 use statement_handler::{
     Statement,
     prepare_statement,
+    execute_statement,
 };
 
 mod statement_handler;
@@ -35,7 +36,8 @@ fn main() {
 
         let mut stmt =  Statement::new();
         match prepare_statement(&input, &mut stmt) {
-            _ => println!("Stuff")
+            Success => execute_statement(stmt),
+            UnrecognizedStatement => println!("Unrecognized statement {}", input)
         }
     }    
 }
