@@ -32,6 +32,11 @@ pub fn prepare_statement(command: &String, statement: &mut Statement) -> Prepare
    }
 }
 
+pub fn execute_statement(mut stmt: Statement) { }
+
+/////////////////////////////////
+/// Test Section
+/////////////////////////////////
 #[cfg(test)]
 mod test {
    use super::*;
