@@ -32,6 +32,7 @@ pub fn prepare_statement(command: &String, statement: &mut Statement) -> Prepare
 #[cfg(test)]
 mod test {
    use super::*;
+   use super::super::statement_enums::StatementType;
    use super::super::statement_enums::PrepareResult::{
       Success,
       UnrecognizedStatement
@@ -51,9 +52,15 @@ mod test {
    fn test_select_stmt() {
       let stmt_string = String::from("select");
       let mut stmt = Statement::new();
+      
       match prepare_statement(&stmt_string, &mut stmt) {
          Success => assert!(true),
          _ => assert!(false, "a short statement must return success")
+      }
+
+      match stmt.st_type {
+         StatementType::SelectStatement => assert!(true),
+         _ => assert!(false, "Wrong statement type")
       }
    }
 }
