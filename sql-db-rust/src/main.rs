@@ -33,9 +33,9 @@ fn main() {
             continue;
         }
 
-        let s =  Statement{ 
-            st_type: StatementType::None,
-        };
-    }
-    
+        let mut stmt =  Statement::new();
+        match prepare_statement(&input, &mut stmt) {
+            _ => println!("Stuff")
+        }
+    }    
 }

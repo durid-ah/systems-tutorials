@@ -6,7 +6,7 @@ pub struct Statement {
 }
 
 impl Statement {
-   fn new() -> Statement {
+   pub fn new() -> Statement {
       Statement{st_type: StatementType::None}
    }
 }
