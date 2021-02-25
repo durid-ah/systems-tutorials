@@ -6,15 +6,18 @@ pub struct Statement {
 }
 
 impl Statement {
-    fn new() -> Statement {
-        Statement{st_type: StatementType::None}
-    }
+   fn new() -> Statement {
+      Statement{st_type: StatementType::None}
+   }
 }
 
+
+/// Prcesses the incoming statement from the user
 pub fn prepare_statement(command: &String, statement: &mut Statement) -> PrepareResult {
    if command.len() < 6 {
       return PrepareResult::UnrecognizedStatement
    }
+
    let operation = &command[0..6];
    match operation {
       "select" => {
@@ -60,6 +63,22 @@ mod test {
 
       match stmt.st_type {
          StatementType::SelectStatement => assert!(true),
+         _ => assert!(false, "Wrong statement type")
+      }
+   }
+
+   #[test]
+   fn test_insert_stmt() {
+      let stmt_string = String::from("insert");
+      let mut stmt = Statement::new();
+      
+      match prepare_statement(&stmt_string, &mut stmt) {
+         Success => assert!(true),
+         _ => assert!(false, "a short statement must return success")
+      }
+
+      match stmt.st_type {
+         StatementType::InsertStatement => assert!(true),
          _ => assert!(false, "Wrong statement type")
       }
    }
