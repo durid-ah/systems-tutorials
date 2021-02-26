@@ -6,6 +6,7 @@ pub struct Statement {
 }
 
 impl Statement {
+   /// Construct a statement
    pub fn new() -> Statement {
       Statement{st_type: StatementType::None}
    }
@@ -32,6 +33,8 @@ pub fn prepare_statement(command: &String, statement: &mut Statement) -> Prepare
    }
 }
 
+
+/// Execute user statement
 pub fn execute_statement(stmt: Statement) {
    match stmt.st_type {
       StatementType::SelectStatement => println!("This is where we would do a select"),

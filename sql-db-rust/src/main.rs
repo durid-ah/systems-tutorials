@@ -9,7 +9,7 @@ use statement_handler::{
 
 mod statement_handler;
 mod statement_enums;
-
+mod table;
 
 fn parse_meta_command(user_input: &String) {
     let input = user_input.trim_end();
