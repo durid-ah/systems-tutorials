@@ -1,6 +1,6 @@
 use std::io::{stdin, stdout, Write};
 use std::process;
-use statement_enums::StatementType;
+use statement_enums::PrepareResult;
 use statement_handler::{
     Statement,
     prepare_statement,
@@ -36,8 +36,8 @@ fn main() {
 
         let mut stmt =  Statement::new();
         match prepare_statement(&input, &mut stmt) {
-            Success => execute_statement(stmt),
-            UnrecognizedStatement => println!("Unrecognized statement {}", input)
+            PrepareResult::Success => execute_statement(stmt),
+            PrepareResult::UnrecognizedStatement => println!("Unrecognized statement {}", input)
         }
     }    
 }
