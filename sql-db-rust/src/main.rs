@@ -15,7 +15,7 @@ fn parse_meta_command(user_input: &String) {
     let input = user_input.trim_end();
     match input {
         ".exit" => process::exit(0),
-        _ => println!("Unrecognized Command '{}'", input)
+        _ => println!("Unrecognized Meta Command '{}'", input)
     }
 }
 
@@ -37,7 +37,7 @@ fn main() {
         let mut stmt =  Statement::new();
         match prepare_statement(&input, &mut stmt) {
             PrepareResult::Success => execute_statement(stmt),
-            PrepareResult::UnrecognizedStatement => println!("Unrecognized statement {}", input)
+            PrepareResult::UnrecognizedStatement => println!("Unrecognized statement: \n\t{}", input.trim())
         }
     }    
 }
