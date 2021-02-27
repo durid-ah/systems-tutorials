@@ -1,14 +1,17 @@
 use super::statement_enums::{StatementType, PrepareResult};
+use super::table::Row;
 
 /// The syruct containing the statement data
 pub struct Statement {
-   pub st_type: StatementType 
+   pub statement_type: StatementType,
+   pub row_data: Option<Row>,
 }
+
 
 impl Statement {
    /// Construct a statement
    pub fn new() -> Statement {
-      Statement{st_type: StatementType::None}
+      Statement{statement_type: StatementType::None, row_data: None}
    }
 }
 
@@ -22,11 +25,11 @@ pub fn prepare_statement(command: &String, statement: &mut Statement) -> Prepare
    let operation = &command[0..6];
    match operation {
       "select" => {
-         statement.st_type = StatementType::SelectStatement;
+         statement.statement_type = StatementType::SelectStatement;
          return PrepareResult::Success;
       },
       "insert" => {
-         statement.st_type = StatementType::InsertStatement;
+         statement.statement_type = StatementType::InsertStatement;
          return PrepareResult::Success;
       },
       _ => return PrepareResult::UnrecognizedStatement
@@ -36,7 +39,7 @@ pub fn prepare_statement(command: &String, statement: &mut Statement) -> Prepare
 
 /// Execute user statement
 pub fn execute_statement(stmt: Statement) {
-   match stmt.st_type {
+   match stmt.statement_type {
       StatementType::SelectStatement => println!("This is where we would do a select"),
       StatementType::InsertStatement => println!("This is where we would do an insert"),
       StatementType::None => println!("Unrecognized Statement"),
@@ -75,7 +78,7 @@ mod test {
          _ => assert!(false, "a short statement must return success")
       }
 
-      match stmt.st_type {
+      match stmt.statement_type {
          StatementType::SelectStatement => assert!(true),
          _ => assert!(false, "Wrong statement type")
       }
@@ -91,7 +94,7 @@ mod test {
          _ => assert!(false, "a short statement must return success")
       }
 
-      match stmt.st_type {
+      match stmt.statement_type {
          StatementType::InsertStatement => assert!(true),
          _ => assert!(false, "Wrong statement type")
       }
