@@ -13,16 +13,34 @@ impl Statement {
    pub fn new() -> Statement {
       Statement{statement_type: StatementType::None, row_data: None}
    }
+
+   pub fn parse_row(&self, row: Vec<&str>) -> PrepareResult {
+      let mut result = PrepareResult::UnrecognizedStatement;
+
+      match self.statement_type {
+         StatementType::InsertStatement => result = self._insert_parse(row),
+         _ => ()
+      }
+
+      result
+   }
+
+   fn _insert_parse(&self, row: Vec<&str>) -> PrepareResult {
+      if row.len() != 3 {
+         return PrepareResult::UnrecognizedStatement
+      }
+
+      
+      PrepareResult::Success
+   }
 }
 
 
 /// Prcesses the incoming statement from the user
 pub fn prepare_statement(command: &String, statement: &mut Statement) -> PrepareResult {
-   if command.len() < 6 {
-      return PrepareResult::UnrecognizedStatement
-   }
-
-   let operation = &command[0..6];
+   let split_input: Vec<&str> = command.trim().split(" ").collect();
+   
+   let operation = split_input[0];
    match operation {
       "select" => {
          statement.statement_type = StatementType::SelectStatement;
@@ -45,6 +63,7 @@ pub fn execute_statement(stmt: Statement) {
       StatementType::None => println!("Unrecognized Statement"),
    }
 }
+
 
 /////////////////////////////////
 /// Test Section
@@ -75,7 +94,7 @@ mod test {
       
       match prepare_statement(&stmt_string, &mut stmt) {
          Success => assert!(true),
-         _ => assert!(false, "a short statement must return success")
+         _ => assert!(false, "must return success")
       }
 
       match stmt.statement_type {

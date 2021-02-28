@@ -9,7 +9,7 @@ impl Row {
       if username.len() > 32 || username.len() == 0 {
          return Result::Err(String::from("username must have between 1 and 32 characcters"));
       }
-
+      
       if email.len() > 255 || email.len() == 0 {
          return Result::Err(String::from("username must have between 1 and 255 characcters"));
       }
@@ -19,3 +19,6 @@ impl Row {
 }
 
 // TODO: Write tests
+mod test {
+   
+}
