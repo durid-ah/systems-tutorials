@@ -14,7 +14,7 @@ impl Statement {
       Statement{statement_type: StatementType::None, row_data: None}
    }
 
-   pub fn parse_row(&self, row: Vec<&str>) -> PrepareResult {
+   pub fn parse_user_input(&mut self, row: Vec<&str>) -> PrepareResult {
       let mut result = PrepareResult::UnrecognizedStatement;
 
       match self.statement_type {
@@ -25,13 +25,29 @@ impl Statement {
       result
    }
 
-   fn _insert_parse(&self, row: Vec<&str>) -> PrepareResult {
-      if row.len() != 3 {
+   fn _insert_parse(&mut self, row: Vec<&str>) -> PrepareResult {
+      if row.len() != 4 {
          return PrepareResult::UnrecognizedStatement
       }
 
+      let id: u32;
+      let username = row[2];
+      let email = row[3].trim();
       
-      PrepareResult::Success
+      if let Result::Ok(num) = row[1].trim().parse::<u32>() {
+         id = num;
+      } else {
+         return PrepareResult::UnrecognizedStatement
+      }
+
+      let row_result = Row::new(id, username, email);
+      match row_result {
+         Ok(r) => {
+            self.row_data = Some(r);
+            return PrepareResult::Success
+         }
+         Err(_) => return PrepareResult::UnrecognizedStatement
+      }
    }
 }
 
