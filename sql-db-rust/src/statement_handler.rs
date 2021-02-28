@@ -1,7 +1,7 @@
 use super::statement_enums::{StatementType, PrepareResult};
 use super::table::Row;
 
-/// The syruct containing the statement data
+/// The struct containing the statement data
 pub struct Statement {
    pub statement_type: StatementType,
    pub row_data: Option<Row>,
@@ -64,7 +64,7 @@ pub fn prepare_statement(command: &String, statement: &mut Statement) -> Prepare
       },
       "insert" => {
          statement.statement_type = StatementType::InsertStatement;
-         return PrepareResult::Success;
+         return statement.parse_user_input(split_input);
       },
       _ => return PrepareResult::UnrecognizedStatement
    }
@@ -94,7 +94,7 @@ mod test {
    };
    
    #[test]
-   fn test_stmt_shorter_than_6_chars() {
+   fn test_incorrect_stmt() {
      let stmt_string = String::from("selec");
      let mut stmt = Statement::new();
      match prepare_statement(&stmt_string, &mut stmt) {
@@ -121,7 +121,7 @@ mod test {
 
    #[test]
    fn test_insert_stmt() {
-      let stmt_string = String::from("insert");
+      let stmt_string = String::from("insert 1 stuff morestuff");
       let mut stmt = Statement::new();
       
       match prepare_statement(&stmt_string, &mut stmt) {
