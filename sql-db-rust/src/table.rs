@@ -1,3 +1,7 @@
+use std::vec::Vec;
+
+const TABLE_MAX_PAGES: usize = 100;
+
 pub struct Row {
    pub id: u32,
    pub username: String,
@@ -6,6 +10,8 @@ pub struct Row {
 
 impl Row {
    pub fn new(id:u32, username: &str, email: &str) -> Result<Row, String> {
+      let m3 = vec![vec![1, 2, 3], vec![4, 5, 6], vec![7, 8, 9]];
+
       if username.len() > 32 || username.len() == 0 {
          return Result::Err(String::from("username must have between 1 and 32 characcters"));
       }
@@ -16,6 +22,11 @@ impl Row {
 
       Result::Ok(Row{id, username: String::from(username), email: String::from(email)})
    }
+}
+
+pub struct Table {
+   pub num_rows: u32,
+   pub pages: [ [u8; 10]; TABLE_MAX_PAGES]
 }
 
 // TODO: Write tests
