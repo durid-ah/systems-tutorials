@@ -85,7 +85,7 @@ pub fn execute_statement(stmt: Statement) {
 /// Test Section
 /////////////////////////////////
 #[cfg(test)]
-mod test {
+mod tests {
    use super::*;
    use super::super::statement_enums::StatementType;
    use super::super::statement_enums::PrepareResult::{

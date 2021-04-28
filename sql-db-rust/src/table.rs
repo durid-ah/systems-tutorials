@@ -19,6 +19,20 @@ impl Row {
 }
 
 // TODO: Write tests
-mod test {
-   
+#[cfg(test)]
+mod tests {
+   use super::*;
+
+   #[test]
+   fn test_row_creation() {
+      let new_row = Row::new(1, "user", "email");
+      match new_row {
+         Result::Ok(r) => {
+            assert_eq!(r.id, 1);
+            assert_eq!(r.username, "user");
+            assert_eq!(r.email, "email");
+         }
+         _ => assert!(false, "Unable to create row")
+      }
+   }
 }
