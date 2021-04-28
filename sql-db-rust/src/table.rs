@@ -10,7 +10,6 @@ pub struct Row {
 
 impl Row {
    pub fn new(id:u32, username: &str, email: &str) -> Result<Row, String> {
-      let m3 = vec![vec![1, 2, 3], vec![4, 5, 6], vec![7, 8, 9]];
 
       if username.len() > 32 || username.len() == 0 {
          return Result::Err(String::from("username must have between 1 and 32 characcters"));
