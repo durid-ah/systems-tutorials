@@ -1,6 +1,8 @@
-use std::vec::Vec;
-
+const PAGE_SIZE: u32 = 4096;
 const TABLE_MAX_PAGES: usize = 100;
+const ROW_SIZE: usize = 307;
+const ROWS_PER_PAGE: u32 = PAGE_SIZE / (ROW_SIZE as u32);
+const TABLE_MAX_ROWS: u32 = ROWS_PER_PAGE * (TABLE_MAX_PAGES as u32);
 
 pub struct Row {
    pub id: u32,
@@ -25,7 +27,18 @@ impl Row {
 
 pub struct Table {
    pub num_rows: u32,
-   pub pages: [ [u8; 10]; TABLE_MAX_PAGES]
+   pub pages: [[u8; ROW_SIZE]; TABLE_MAX_PAGES]
+}
+
+impl Table {
+   pub fn new() -> Table {
+      return Table{num_rows: 0, pages: [[0; ROW_SIZE]; TABLE_MAX_PAGES]}
+   }
+
+   pub fn row_slot(&mut self, row_num: u32) {
+      let page_num: u32 = row_num / ROWS_PER_PAGE;
+      
+   }
 }
 
 // TODO: Write tests
