@@ -35,11 +35,10 @@ impl Table {
       return Table{num_rows: 0, pages: [[[0; ROW_SIZE]; ROWS_PER_PAGE]; TABLE_MAX_PAGES]}
    }
 
-   pub fn row_slot(&mut self, row_num: usize) {
+   pub fn get_row(&mut self, row_num: usize) -> &mut [u8; ROW_SIZE] {
       let page_num: usize = row_num / ROWS_PER_PAGE;
-      let idx = 0;
-      let page = &self.pages[(page_num as usize)];  
-      println!("{:?}", page)
+      let row_idx: usize = row_num % ROWS_PER_PAGE;
+      &mut self.pages[(page_num as usize)][row_idx]
    }
 }
 
@@ -64,6 +63,8 @@ mod tests {
    #[test]
    fn row_slot_test() {
       let mut r = Table::new();
-      r.row_slot(1);
+      let s = &mut r.get_row(1);
+      s[1] = 1;
+      println!("{:?}", s);
    }
 }
