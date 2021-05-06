@@ -1,8 +1,8 @@
 const PAGE_SIZE: u32 = 4096;
 const TABLE_MAX_PAGES: usize = 100;
 const ROW_SIZE: usize = 307;
-const ROWS_PER_PAGE: u32 = PAGE_SIZE / (ROW_SIZE as u32);
-const TABLE_MAX_ROWS: u32 = ROWS_PER_PAGE * (TABLE_MAX_PAGES as u32);
+const ROWS_PER_PAGE: usize = (PAGE_SIZE as usize) / ROW_SIZE;
+const TABLE_MAX_ROWS: usize = ROWS_PER_PAGE * TABLE_MAX_PAGES;
 
 pub struct Row {
    pub id: u32,
@@ -27,17 +27,19 @@ impl Row {
 
 pub struct Table {
    pub num_rows: u32,
-   pub pages: [[u8; ROW_SIZE]; TABLE_MAX_PAGES]
+   pub pages: [[[u8; ROW_SIZE]; ROWS_PER_PAGE]; TABLE_MAX_PAGES]
 }
 
 impl Table {
    pub fn new() -> Table {
-      return Table{num_rows: 0, pages: [[0; ROW_SIZE]; TABLE_MAX_PAGES]}
+      return Table{num_rows: 0, pages: [[[0; ROW_SIZE]; ROWS_PER_PAGE]; TABLE_MAX_PAGES]}
    }
 
-   pub fn row_slot(&mut self, row_num: u32) {
-      let page_num: u32 = row_num / ROWS_PER_PAGE;
-      
+   pub fn row_slot(&mut self, row_num: usize) {
+      let page_num: usize = row_num / ROWS_PER_PAGE;
+      let idx = 0;
+      let page = &self.pages[(page_num as usize)];  
+      println!("{:?}", page)
    }
 }
 
@@ -57,5 +59,11 @@ mod tests {
          }
          _ => assert!(false, "Unable to create row")
       }
+   }
+
+   #[test]
+   fn row_slot_test() {
+      let mut r = Table::new();
+      r.row_slot(1);
    }
 }
