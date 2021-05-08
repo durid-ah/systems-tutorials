@@ -1,3 +1,7 @@
+use std::vec;
+use std::mem::{self, MaybeUninit};
+
+
 const PAGE_SIZE: u32 = 4096;
 const TABLE_MAX_PAGES: usize = 100;
 const ROW_SIZE: usize = 307;
@@ -27,18 +31,48 @@ impl Row {
 
 pub struct Table {
    pub num_rows: u32,
-   pub pages: [[[u8; ROW_SIZE]; ROWS_PER_PAGE]; TABLE_MAX_PAGES]
+   pub pages: [Option<[Option<Vec<u8>>; ROWS_PER_PAGE]>; TABLE_MAX_PAGES]
 }
 
 impl Table {
    pub fn new() -> Table {
-      return Table{num_rows: 0, pages: [[[0; ROW_SIZE]; ROWS_PER_PAGE]; TABLE_MAX_PAGES]}
+      
+      let _pages = {
+         let mut _pages: [MaybeUninit<Option<[Option<Vec<u8>>; ROWS_PER_PAGE]>>; TABLE_MAX_PAGES] = unsafe {
+            MaybeUninit::uninit().assume_init()
+         };
+
+         for elem in &mut _pages[..] {
+            *elem = MaybeUninit::new(Option::None);
+         }
+
+         unsafe { mem::transmute::<_, [Option<[Option<Vec<u8>>; ROWS_PER_PAGE]>; TABLE_MAX_PAGES]>(_pages)}
+      };
+      return Table{num_rows: 0, pages: _pages}
    }
 
-   pub fn get_row(&mut self, row_num: usize) -> &mut [u8; ROW_SIZE] {
+   pub fn get_row(&mut self, row_num: usize) -> &mut Option<Vec<u8>> {
       let page_num: usize = row_num / ROWS_PER_PAGE;
       let row_idx: usize = row_num % ROWS_PER_PAGE;
-      &mut self.pages[(page_num as usize)][row_idx]
+      let page = &mut self.pages[(page_num as usize)];
+      if let Option::None =  page {
+         let mut _page: [Option<Vec<u8>>; ROWS_PER_PAGE] = {
+            let mut _init_page : [MaybeUninit<Option<Vec<u8>>>; ROWS_PER_PAGE] = unsafe {
+               MaybeUninit::uninit().assume_init()
+            };
+
+            for r in &mut _init_page[..] {
+               *r = MaybeUninit::new(Option::None);
+            }
+            
+            unsafe {mem::transmute(_init_page)}
+         };
+
+         *page = Option::Some(_page);
+      }
+
+      let res = self.pages[(page_num as usize)].as_mut().unwrap();
+      &mut res[row_idx]
    }
 }
 
@@ -64,7 +98,6 @@ mod tests {
    fn row_slot_test() {
       let mut r = Table::new();
       let s = &mut r.get_row(1);
-      s[1] = 1;
       println!("{:?}", s);
    }
 }
