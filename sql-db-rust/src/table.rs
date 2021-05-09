@@ -5,7 +5,7 @@ use std::mem::{self, MaybeUninit};
 const PAGE_SIZE: u32 = 4096;
 const TABLE_MAX_PAGES: usize = 100;
 const ROW_SIZE: usize = 307;
-const ROWS_PER_PAGE: usize = (PAGE_SIZE as usize) / ROW_SIZE;
+const ROWS_PER_PAGE: usize = (PAGE_SIZE as usize) / ROW_SIZE; // About 13 rows
 const TABLE_MAX_ROWS: usize = ROWS_PER_PAGE * TABLE_MAX_PAGES;
 
 pub struct Row {
@@ -51,9 +51,14 @@ impl Table {
       return Table{num_rows: 0, pages: _pages}
    }
 
+   fn get_page_idx(&self, row_num: usize) -> usize { return row_num / ROWS_PER_PAGE}
+
+   fn get_row_idx(&self, row_num: usize) -> usize { return row_num % ROWS_PER_PAGE }
+
    pub fn get_row(&mut self, row_num: usize) -> &mut Option<Vec<u8>> {
-      let page_num: usize = row_num / ROWS_PER_PAGE;
-      let row_idx: usize = row_num % ROWS_PER_PAGE;
+      let page_num: usize = self.get_page_idx(row_num);
+      let row_idx: usize = self.get_row_idx(row_num);
+
       let page = &mut self.pages[(page_num as usize)];
       if let Option::None =  page {
          let mut _page: [Option<Vec<u8>>; ROWS_PER_PAGE] = {
@@ -95,9 +100,17 @@ mod tests {
    }
 
    #[test]
-   fn row_slot_test() {
+   fn page_idx_test() {
       let mut r = Table::new();
-      let s = &mut r.get_row(1);
-      println!("{:?}", s);
+      let first_page_idx = r.get_page_idx(0);
+      let first_page_idx_2 = r.get_page_idx(12);
+      
+      assert_eq!(first_page_idx, 0,
+         "The first row must return the first page in the table"
+      );
+
+      assert_eq!(first_page_idx_2, 0,
+         "The 13th row must return the first page in the table"
+      );
    }
 }
