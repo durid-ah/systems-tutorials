@@ -14,3 +14,8 @@ pub enum PrepareResult {
    Success,
    UnrecognizedStatement
 }
+
+pub enum ExecuteResult {
+   TableFull,
+   Success
+}
