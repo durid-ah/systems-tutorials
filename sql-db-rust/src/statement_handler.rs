@@ -1,5 +1,5 @@
 use super::statement_enums::{StatementType, PrepareResult};
-use super::table::{Row, Table};
+use super::table::{Row, Table, ExecuteResult};
 
 /// The struct containing the statement data
 pub struct Statement {
@@ -74,9 +74,18 @@ pub fn prepare_statement(command: &String, statement: &mut Statement) -> Prepare
 /// Execute user statement
 pub fn execute_statement(stmt: Statement, db: &mut Table) {
    match stmt.statement_type {
-      StatementType::SelectStatement => println!("This is where we would do a select"),
+      StatementType::SelectStatement => {
+         let res = db.select_rows();
+         println!("Debugging {:?}", res);
+         for item in res {
+            println!("{} - {} - {}", item.id, item.username, item.email)
+         }
+      },
       StatementType::InsertStatement => {
-         db.insert_row(&stmt.row_data.unwrap());
+         match db.insert_row(&stmt.row_data.unwrap()) {
+            ExecuteResult::TableFull => println!("Insert Error: the table is full"),
+            ExecuteResult::Success => println!("Insert successful")
+         }
       },
       StatementType::None => println!("Unrecognized Statement"),
    }
