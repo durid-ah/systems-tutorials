@@ -9,6 +9,15 @@ const ROW_SIZE: usize = 307;
 const ROWS_PER_PAGE: usize = (PAGE_SIZE as usize) / ROW_SIZE; // About 13 rows
 const TABLE_MAX_ROWS: usize = ROWS_PER_PAGE * TABLE_MAX_PAGES;
 
+/// convert the row to a vec<u8>
+fn _serialize_row(row: &Row) -> Vec<u8> {
+   bincode::serialize(&row).unwrap()
+}
+
+fn _deserialize_row(row: &Vec<u8>) -> Row {
+   bincode::deserialize(&row).unwrap()
+}
+
 pub enum ExecuteResult {
    TableFull,
    Success
@@ -97,16 +106,23 @@ impl Table {
          return ExecuteResult::TableFull;
       }
 
-      let bin_row = self._serialize_row(row);
+      let bin_row = _serialize_row(row);
       let table_row = self.get_row(self.num_rows);
       *table_row = Some(bin_row);
 
       ExecuteResult::Success
    }
 
-   /// convert the row to a vec<u8>
-   fn _serialize_row(&self, row: &Row) -> Vec<u8> {
-      bincode::serialize(&row).unwrap()
+   pub fn select_rows(&mut self) -> Vec<Row> {
+      let mut res: Vec<Row> = Vec::new();
+      for i in 0..(self.num_rows + 1) {
+         let r = self.get_row(i).clone();
+      
+         let deserialized_r = _deserialize_row(&r.unwrap());
+         res.push(deserialized_r);
+      }
+
+      res
    }
 }
 
@@ -130,7 +146,7 @@ mod tests {
 
    #[test]
    fn page_idx_test() {
-      let mut r = Table::new();
+      let r = Table::new();
       let first_page_idx = r.get_page_idx(0);
       let first_page_idx_2 = r.get_page_idx(12);
       
@@ -141,5 +157,13 @@ mod tests {
       assert_eq!(first_page_idx_2, 0,
          "The 13th row must return the first page in the table"
       );
+   }
+
+   #[test]
+   fn insert_into_table() {
+      let mut r = Table::new();
+      r.insert_row(&Row::new(1, "stuff", "stuff").unwrap());
+      println!("{:?}", r.pages);
+      assert!(false)
    }
 }
