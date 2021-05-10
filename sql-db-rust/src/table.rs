@@ -42,6 +42,7 @@ pub struct Table {
 }
 
 impl Table {
+   /// Create the table
    pub fn new() -> Table {
       
       let _pages = {
@@ -58,10 +59,13 @@ impl Table {
       return Table{num_rows: 0, pages: _pages}
    }
 
+   /// Return the index of the page where the row number resides
    fn get_page_idx(&self, row_num: usize) -> usize { return row_num / ROWS_PER_PAGE}
 
+   /// Get the row within the page where the row resides
    fn get_row_idx(&self, row_num: usize) -> usize { return row_num % ROWS_PER_PAGE }
 
+   /// Get a reference to the row in the table based on the row number
    pub fn get_row(&mut self, row_num: usize) -> &mut Option<Vec<u8>> {
       let page_num: usize = self.get_page_idx(row_num);
       let row_idx: usize = self.get_row_idx(row_num);
@@ -87,6 +91,7 @@ impl Table {
       &mut res[row_idx]
    }
 
+   /// Insert the row into the next available slot
    pub fn insert_row(&mut self, row: &Row) -> ExecuteResult {
       if self.num_rows >= TABLE_MAX_ROWS {
          return ExecuteResult::TableFull;
@@ -99,6 +104,7 @@ impl Table {
       ExecuteResult::Success
    }
 
+   /// convert the row to a vec<u8>
    fn _serialize_row(&self, row: &Row) -> Vec<u8> {
       bincode::serialize(&row).unwrap()
    }
