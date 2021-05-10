@@ -75,13 +75,11 @@ pub fn prepare_statement(command: &String, statement: &mut Statement) -> Prepare
 pub fn execute_statement(stmt: Statement, db: &mut Table) {
    match stmt.statement_type {
       StatementType::SelectStatement => println!("This is where we would do a select"),
-      StatementType::InsertStatement => println!("This is where we would do an insert"),
+      StatementType::InsertStatement => {
+         db.insert_row(&stmt.row_data.unwrap());
+      },
       StatementType::None => println!("Unrecognized Statement"),
    }
-}
-
-fn execute_insert(statement: &Statement, db: &mut Table) {
-   // statement.row_data
 }
 
 
