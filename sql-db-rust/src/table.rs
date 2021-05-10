@@ -1,6 +1,7 @@
 use std::vec;
+use bincode;
+use serde::{Serialize, Deserialize};
 use std::mem::{self, MaybeUninit};
-
 
 const PAGE_SIZE: u32 = 4096;
 const TABLE_MAX_PAGES: usize = 100;
@@ -8,6 +9,12 @@ const ROW_SIZE: usize = 307;
 const ROWS_PER_PAGE: usize = (PAGE_SIZE as usize) / ROW_SIZE; // About 13 rows
 const TABLE_MAX_ROWS: usize = ROWS_PER_PAGE * TABLE_MAX_PAGES;
 
+pub enum ExecuteResult {
+   TableFull,
+   Success
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Row {
    pub id: u32,
    pub username: String,
@@ -30,7 +37,7 @@ impl Row {
 }
 
 pub struct Table {
-   pub num_rows: u32,
+   pub num_rows: usize,
    pub pages: [Option<[Option<Vec<u8>>; ROWS_PER_PAGE]>; TABLE_MAX_PAGES]
 }
 
@@ -78,6 +85,22 @@ impl Table {
 
       let res = self.pages[(page_num as usize)].as_mut().unwrap();
       &mut res[row_idx]
+   }
+
+   pub fn insert_row(&mut self, row: &Row) -> ExecuteResult {
+      if self.num_rows >= TABLE_MAX_ROWS {
+         return ExecuteResult::TableFull;
+      }
+
+      let bin_row = self._serialize_row(row);
+      let table_row = self.get_row(self.num_rows);
+      *table_row = Some(bin_row);
+
+      ExecuteResult::Success
+   }
+
+   fn _serialize_row(&self, row: &Row) -> Vec<u8> {
+      bincode::serialize(&row).unwrap()
    }
 }
 

@@ -1,6 +1,7 @@
 use std::io::{stdin, stdout, Write};
 use std::process;
 use statement_enums::PrepareResult;
+use table::Table;
 use statement_handler::{
     Statement,
     prepare_statement,
@@ -20,6 +21,7 @@ fn parse_meta_command(user_input: &String) {
 }
 
 fn main() {
+    let mut internal_db = Table::new();
     loop {
         let mut input = String::new();
         print!("db > ");
@@ -36,7 +38,7 @@ fn main() {
 
         let mut stmt =  Statement::new();
         match prepare_statement(&input, &mut stmt) {
-            PrepareResult::Success => execute_statement(stmt),
+            PrepareResult::Success => execute_statement(stmt, &mut internal_db),
             PrepareResult::UnrecognizedStatement => println!("Unrecognized statement: \n\t{}", input.trim())
         }
     }    
