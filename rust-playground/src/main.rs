@@ -16,8 +16,6 @@ pub struct Row {
 }
 
 fn main() {
-    let arr_1: [i32; 8] = [2; 8];
-
     // let s = String::from_utf8(vec![b'x'; 255]).unwrap();
     // let s1 = String::from_utf8(vec![b'x'; 32]).unwrap();
     // let r3: Row = Row{id: 1, username: s, email: s1};

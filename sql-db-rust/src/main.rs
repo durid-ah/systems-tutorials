@@ -2,8 +2,8 @@ use std::io::{stdin, stdout, Write};
 use std::process;
 use statement_enums::PrepareResult;
 use table::Table;
+use statement::Statement;
 use statement_handler::{
-    Statement,
     prepare_statement,
     execute_statement,
 };
@@ -11,6 +11,8 @@ use statement_handler::{
 mod statement_handler;
 mod statement_enums;
 mod table;
+mod statement;
+
 
 fn parse_meta_command(user_input: &String) {
     let input = user_input.trim_end();
