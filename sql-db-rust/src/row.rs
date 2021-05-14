@@ -31,3 +31,6 @@ impl Row {
       Result::Ok(Row{id, username: String::from(username), email: String::from(email)})
    }
 }
+
+// TODO: Test the creation of a Row struct
+// TODO: Test the with a too long username, email
