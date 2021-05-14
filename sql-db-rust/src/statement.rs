@@ -1,5 +1,5 @@
 use super::statement_enums::{StatementType, PrepareResult};
-use super::table::Row;
+use super::row::Row;
 
 /// The struct containing the statement data
 pub struct Statement {

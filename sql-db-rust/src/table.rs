@@ -1,6 +1,5 @@
-use bincode;
-use serde::{Serialize, Deserialize};
 use std::mem::{self, MaybeUninit};
+use super::row::{Row, _serialize_row, _deserialize_row};
 
 const PAGE_SIZE: u32 = 4096;
 const TABLE_MAX_PAGES: usize = 100;
@@ -8,40 +7,9 @@ const ROW_SIZE: usize = 307;
 const ROWS_PER_PAGE: usize = (PAGE_SIZE as usize) / ROW_SIZE; // About 13 rows
 const TABLE_MAX_ROWS: usize = ROWS_PER_PAGE * TABLE_MAX_PAGES;
 
-/// convert the row to a vec<u8>
-fn _serialize_row(row: &Row) -> Vec<u8> {
-   bincode::serialize(&row).unwrap()
-}
-
-fn _deserialize_row(row: &Vec<u8>) -> Row {
-   bincode::deserialize(&row).unwrap()
-}
-
 pub enum ExecuteResult {
    TableFull,
    Success
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Row {
-   pub id: u32,
-   pub username: String,
-   pub email: String,
-}
-
-impl Row {
-   pub fn new(id:u32, username: &str, email: &str) -> Result<Row, String> {
-
-      if username.len() > 32 || username.len() == 0 {
-         return Result::Err(String::from("username must have between 1 and 32 characcters"));
-      }
-      
-      if email.len() > 255 || email.len() == 0 {
-         return Result::Err(String::from("username must have between 1 and 255 characcters"));
-      }
-
-      Result::Ok(Row{id, username: String::from(username), email: String::from(email)})
-   }
 }
 
 pub struct Table {

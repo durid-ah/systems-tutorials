@@ -12,6 +12,7 @@ mod statement_handler;
 mod statement_enums;
 mod table;
 mod statement;
+mod row;
 
 
 fn parse_meta_command(user_input: &String) {
