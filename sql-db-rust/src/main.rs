@@ -42,7 +42,8 @@ fn main() {
         let mut stmt =  Statement::new();
         match prepare_statement(&input, &mut stmt) {
             PrepareResult::Success => execute_statement(stmt, &mut internal_db),
-            PrepareResult::UnrecognizedStatement => println!("Unrecognized statement: \n\t{}", input.trim())
+            PrepareResult::UnrecognizedStatement => println!("Unrecognized statement: \n\t{}", input.trim()),
+            PrepareResult::BadStatement(err) => println!("{}", err)
         }
     }    
 }

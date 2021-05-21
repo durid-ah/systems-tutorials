@@ -45,7 +45,8 @@ impl Statement {
             self.row_data = Some(r);
             return PrepareResult::Success
          }
-         Err(_) => return PrepareResult::UnrecognizedStatement
+
+         Err(err) => return PrepareResult::BadStatement(err)
       }
    }
 }

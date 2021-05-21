@@ -12,5 +12,6 @@ pub enum MetaResult {
 
 pub enum PrepareResult {
    Success,
+   BadStatement(String),
    UnrecognizedStatement
 }
