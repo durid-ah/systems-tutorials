@@ -86,6 +86,27 @@ mod tests {
       
       match prepare_statement(&stmt_string, &mut stmt) {
          Success => assert!(true),
+         _ => assert!(false, "the insert statement must return success")
+      }
+
+      match stmt.statement_type {
+         StatementType::InsertStatement => assert!(true),
+         _ => assert!(false, "Wrong statement type")
+      }
+
+      let row = stmt.row_data.unwrap();
+      assert_eq!(row.id, 1);
+      assert_eq!(row.username, "stuff");
+      assert_eq!(row.email, "morestuff");
+   }
+
+   #[test]
+   fn test_bad_insert_stmt() {
+      let stmt_string = String::from("insert 1 stuff");
+      let mut stmt = Statement::new();
+      
+      match prepare_statement(&stmt_string, &mut stmt) {
+         UnrecognizedStatement => assert!(true),
          _ => assert!(false, "a short statement must return success")
       }
 
@@ -93,5 +114,6 @@ mod tests {
          StatementType::InsertStatement => assert!(true),
          _ => assert!(false, "Wrong statement type")
       }
+      
    }
 }
