@@ -55,12 +55,18 @@ mod tests {
    
    #[test]
    fn test_incorrect_stmt() {
-     let stmt_string = String::from("selec");
-     let mut stmt = Statement::new();
-     match prepare_statement(&stmt_string, &mut stmt) {
-        UnrecognizedStatement => assert!(true),
-        _ => assert!(false, "a short statement must return unrecognized statement")
-     }
+      let stmt_string = String::from("selec");
+      let mut stmt = Statement::new();
+      
+      match prepare_statement(&stmt_string, &mut stmt) {
+         UnrecognizedStatement => assert!(true),
+         _ => assert!(false, "a short statement must return unrecognized statement")
+      }
+
+      match stmt.statement_type {
+         StatementType::None => assert!(true),
+         _ => assert!(false, "statement type must be None")
+      }
    }
 
    #[test]
@@ -117,7 +123,7 @@ mod tests {
       
       match stmt.row_data {
          None => assert!(true),
-         _ => assert!(false, "The row should not have parsed")
+         _ => assert!(false, "The row should not have been parsed")
       }
    }
 }
