@@ -69,4 +69,26 @@ mod tests {
          _ => assert!(false, "The row must not instantiate properly")
       }
    }
+
+   #[test]
+   fn test_too_long_email() {
+      let email = String::from_utf8(vec![b'X'; 256]).unwrap();
+
+      let r = Row::new(1, "someuser", email.as_str());
+
+      match r {
+         Err(er) => assert_eq!(er, "email must have between 1 and 255 characcters"),
+         _ => assert!(false, "The row must not instantiate properly")
+      }
+   }
+
+   #[test]
+   fn test_too_short_email() {
+      let r = Row::new(1, "someuser", "");
+
+      match r {
+         Err(er) => assert_eq!(er, "email must have between 1 and 255 characcters"),
+         _ => assert!(false, "The row must not instantiate properly")
+      }
+   }
 }
