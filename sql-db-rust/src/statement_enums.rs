@@ -5,10 +5,10 @@ pub enum StatementType {
    None
 }
 
-pub enum MetaResult {
-   CommandSuccess,
-   UnrecognizedCommand
-}
+// pub enum MetaResult {
+//    CommandSuccess,
+//    UnrecognizedCommand
+// }
 
 pub enum PrepareResult {
    Success,
