@@ -115,5 +115,9 @@ mod tests {
          _ => assert!(false, "Wrong statement type")
       }
       
+      match stmt.row_data {
+         None => assert!(true),
+         _ => assert!(false, "The row should not have parsed")
+      }
    }
 }
