@@ -130,7 +130,7 @@ mod tests {
    fn insert_into_table() {
       let mut r = Table::new();
       r.insert_row(&Row::new(1, "stuff", "stuff").unwrap());
-      println!("{:?}", r.pages);
-      assert!(false)
+      //println!("{:?}", r.pages);
+      //assert!(false)
    }
 }
