@@ -25,12 +25,48 @@ impl Row {
       }
       
       if email.len() > 255 || email.len() == 0 {
-         return Result::Err(String::from("username must have between 1 and 255 characcters"));
+         return Result::Err(String::from("email must have between 1 and 255 characcters"));
       }
 
       Result::Ok(Row{id, username: String::from(username), email: String::from(email)})
    }
 }
 
-// TODO: Test the creation of a Row struct
-// TODO: Test the with a too long username, email
+#[cfg(test)]
+mod tests {
+   use super::*;
+
+   #[test]
+   fn test_proper_creation() {
+      let r = Row::new(1, "someuser", "email");
+
+      match r {
+         Ok(val) => {
+            assert_eq!(val.id, 1);
+            assert_eq!(val.username, "someuser");
+            assert_eq!(val.email, "email");
+         },
+         _ => assert!(false, "An error occured while properly instantiating a row")
+      }
+   }
+
+   #[test]
+   fn test_too_long_username() {
+      let r = Row::new(1, "someusersssssssssssssssssssssssss", "email");
+
+      match r {
+         Err(er) => assert_eq!(er, "username must have between 1 and 32 characcters"),
+         _ => assert!(false, "The row must not instantiate properly")
+      }
+   }
+
+   #[test]
+   fn test_too_short_username() {
+      let r = Row::new(1, "", "email");
+
+      match r {
+         Err(er) => assert_eq!(er, "username must have between 1 and 32 characcters"),
+         _ => assert!(false, "The row must not instantiate properly")
+      }
+   }
+}
