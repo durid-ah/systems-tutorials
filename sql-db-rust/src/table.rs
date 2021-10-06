@@ -20,16 +20,21 @@ pub struct Table {
 impl Table {
    /// Create the table
    pub fn new() -> Table {
-      
+
+      // Initializing each page one by one
+
       let _pages = {
          let mut _pages: [MaybeUninit<Option<[Option<Vec<u8>>; ROWS_PER_PAGE]>>; TABLE_MAX_PAGES] = unsafe {
+            // the compiler assumes the array is initialized when it isn't
             MaybeUninit::uninit().assume_init()
          };
 
+         // set each page to Option::None
          for elem in &mut _pages[..] {
             *elem = MaybeUninit::new(Option::None);
          }
 
+         //remove the MaybeUninit part of the type to make it a an option array
          unsafe { mem::transmute::<_, [Option<[Option<Vec<u8>>; ROWS_PER_PAGE]>; TABLE_MAX_PAGES]>(_pages)}
       };
       return Table{num_rows: 0, pages: _pages}
