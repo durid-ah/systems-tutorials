@@ -89,9 +89,6 @@ impl Table {
       let mut res: Vec<Row> = Vec::new();
       for i in 0..(self.num_rows + 1) {
          let r = self.get_row(i).clone();
-      
-         // TODO: add a check for Option::None instead of just
-         // calling unwrap
 
          if let Option::Some(row) = r {
             let deserialized_r = _deserialize_row(&row);
