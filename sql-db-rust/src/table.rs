@@ -92,8 +92,12 @@ impl Table {
       
          // TODO: add a check for Option::None instead of just
          // calling unwrap
-         let deserialized_r = _deserialize_row(&r.unwrap());
-         res.push(deserialized_r);
+
+         if let Option::Some(row) = r {
+            let deserialized_r = _deserialize_row(&row);
+            res.push(deserialized_r);            
+         }
+
       }
 
       res
