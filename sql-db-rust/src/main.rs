@@ -8,6 +8,7 @@ use statement_handler::{
     execute_statement,
 };
 
+mod size_constants;
 mod statement_handler;
 mod statement_enums;
 mod table;

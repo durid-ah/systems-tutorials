@@ -1,11 +1,12 @@
 use std::mem::{self, MaybeUninit};
 use super::row::{Row, _serialize_row, _deserialize_row};
 
-const PAGE_SIZE: u32 = 4096;
-const TABLE_MAX_PAGES: usize = 100;
-const ROW_SIZE: usize = 307;
-const ROWS_PER_PAGE: usize = (PAGE_SIZE as usize) / ROW_SIZE; // About 13 rows
-const TABLE_MAX_ROWS: usize = ROWS_PER_PAGE * TABLE_MAX_PAGES;
+use super::size_constants::{
+   ROWS_PER_PAGE,
+   TABLE_MAX_PAGES,
+   TABLE_MAX_ROWS
+};
+
 
 pub enum ExecuteResult {
    TableFull,
