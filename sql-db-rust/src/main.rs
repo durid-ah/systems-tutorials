@@ -11,6 +11,7 @@ use statement_handler::{
 mod statement_handler;
 mod statement_enums;
 mod table;
+mod pager;
 mod statement;
 mod row;
 
