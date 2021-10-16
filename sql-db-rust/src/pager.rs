@@ -11,7 +11,6 @@ pub struct Pager {
    pub file: File,
    pub file_length: u64,
    pub pages: [Option<[Option<Vec<u8>>; ROWS_PER_PAGE]>; TABLE_MAX_PAGES]
-
 }
 
 impl Pager {
@@ -44,6 +43,28 @@ impl Pager {
          //remove the MaybeUninit part of the type to make it a an option array
          unsafe { mem::transmute::<_, [Option<[Option<Vec<u8>>; ROWS_PER_PAGE]>; TABLE_MAX_PAGES]>(_pages)}
       };
+   }
+
+   pub fn get_row(&mut self, page_num: usize, row_idx: usize)-> &mut Option<Vec<u8>> {
+      let page = &mut self.pages[(page_num as usize)];
+      if let Option::None =  page {
+         let mut _page: [Option<Vec<u8>>; ROWS_PER_PAGE] = {
+            let mut _init_page : [MaybeUninit<Option<Vec<u8>>>; ROWS_PER_PAGE] = unsafe {
+               MaybeUninit::uninit().assume_init()
+            };
+
+            for r in &mut _init_page[..] {
+               *r = MaybeUninit::new(Option::None);
+            }
+            
+            unsafe {mem::transmute(_init_page)}
+         };
+
+         *page = Option::Some(_page);
+      }
+
+      let res = self.pages[(page_num as usize)].as_mut().unwrap();
+      &mut res[row_idx]
    }
 }
 

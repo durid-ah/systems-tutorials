@@ -26,7 +26,8 @@ fn parse_meta_command(user_input: &String) {
 }
 
 fn main() {
-    let mut internal_db = Table::new();
+    // TODO: Fix the file path when done
+    let mut internal_db = Table::open_db(String::from("app_test_file.txt"));
     loop {
         let mut input = String::new();
         print!("db > ");

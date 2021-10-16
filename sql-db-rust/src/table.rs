@@ -1,9 +1,9 @@
+use crate::pager::Pager;
 use std::mem::{self, MaybeUninit};
 use super::row::{Row, _serialize_row, _deserialize_row};
 
 use super::size_constants::{
    ROWS_PER_PAGE,
-   TABLE_MAX_PAGES,
    TABLE_MAX_ROWS
 };
 
@@ -15,30 +15,14 @@ pub enum ExecuteResult {
 
 pub struct Table {
    pub num_rows: usize,
-   pub pages: [Option<[Option<Vec<u8>>; ROWS_PER_PAGE]>; TABLE_MAX_PAGES]
+   pub pager: Pager
 }
 
 impl Table {
    /// Create the table
-   pub fn new() -> Table {
-
-      // Initializing each page one by one
-
-      let _pages = {
-         let mut _pages: [MaybeUninit<Option<[Option<Vec<u8>>; ROWS_PER_PAGE]>>; TABLE_MAX_PAGES] = unsafe {
-            // the compiler assumes the array is initialized when it isn't
-            MaybeUninit::uninit().assume_init()
-         };
-
-         // set each page to Option::None
-         for elem in &mut _pages[..] {
-            *elem = MaybeUninit::new(Option::None);
-         }
-
-         //remove the MaybeUninit part of the type to make it a an option array
-         unsafe { mem::transmute::<_, [Option<[Option<Vec<u8>>; ROWS_PER_PAGE]>; TABLE_MAX_PAGES]>(_pages)}
-      };
-      return Table{num_rows: 0, pages: _pages}
+   pub fn open_db(file_name: String) -> Table {
+      let _pager = Pager::open_pager(file_name);
+      return Table{num_rows: 0, pager: _pager}
    }
 
    /// Return the index of the page where the row number resides
@@ -47,30 +31,13 @@ impl Table {
    /// Get the row within the page where the row resides
    fn get_row_idx(&self, row_num: usize) -> usize { return row_num % ROWS_PER_PAGE }
 
+   // TODO: Fix this mess!!!!
    /// Get a reference to the row in the table based on the row number
    pub fn get_row(&mut self, row_num: usize) -> &mut Option<Vec<u8>> {
       let page_num: usize = self.get_page_idx(row_num);
       let row_idx: usize = self.get_row_idx(row_num);
 
-      let page = &mut self.pages[(page_num as usize)];
-      if let Option::None =  page {
-         let mut _page: [Option<Vec<u8>>; ROWS_PER_PAGE] = {
-            let mut _init_page : [MaybeUninit<Option<Vec<u8>>>; ROWS_PER_PAGE] = unsafe {
-               MaybeUninit::uninit().assume_init()
-            };
-
-            for r in &mut _init_page[..] {
-               *r = MaybeUninit::new(Option::None);
-            }
-            
-            unsafe {mem::transmute(_init_page)}
-         };
-
-         *page = Option::Some(_page);
-      }
-
-      let res = self.pages[(page_num as usize)].as_mut().unwrap();
-      &mut res[row_idx]
+      self.pager.get_row(page_num, row_idx)
    }
 
    /// Insert the row into the next available slot
@@ -122,7 +89,7 @@ mod tests {
 
    #[test]
    fn page_idx_test() {
-      let r = Table::new();
+      let r = Table::open_db(String::from("test_file.txt"));
       let first_page_idx = r.get_page_idx(0);
       let first_page_idx_2 = r.get_page_idx(12);
       
@@ -137,7 +104,7 @@ mod tests {
 
    #[test]
    fn insert_into_table() {
-      let mut r = Table::new();
+      let mut r = Table::open_db(String::from("test_file.txt"));
       r.insert_row(&Row::new(1, "stuff", "stuff").unwrap());
       //println!("{:?}", r.pages);
       //assert!(false)
