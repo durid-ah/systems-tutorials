@@ -53,7 +53,6 @@ impl Table {
    }
 }
 
-// TODO: Write tests
 #[cfg(test)]
 mod tests {
    use super::*;
@@ -75,7 +74,5 @@ mod tests {
    fn insert_into_table() {
       let mut r = Table::open_db(String::from("test_file.txt"));
       r.insert_row(&Row::new(1, "stuff", "stuff").unwrap());
-      //println!("{:?}", r.pages);
-      //assert!(false)
    }
 }
