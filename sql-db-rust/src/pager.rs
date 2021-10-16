@@ -75,14 +75,3 @@ impl Pager {
       &mut res[row_idx]
    }
 }
-
-#[cfg(test)]
-mod tests {
-   use super::*;
-   
-   #[test]
-   fn constructor_test() {
-      let pager  = Pager::open_pager(String::from("test_file.txt"));
-      assert_eq!(true, true)
-   }
-}
