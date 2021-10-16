@@ -60,19 +60,7 @@ impl Pager {
    
       let page = &mut self.pages[(page_num as usize)];
       if let Option::None =  page {
-         let mut _page: Page = {
-            let mut _init_page : UninitPage = unsafe {
-               MaybeUninit::uninit().assume_init()
-            };
-
-            for r in &mut _init_page[..] {
-               *r = MaybeUninit::new(Option::None);
-            }
-            
-            unsafe {mem::transmute(_init_page)}
-         };
-
-         *page = Option::Some(_page);
+         Pager::init_page_rows(page)
       }
 
       let res = self.pages[(page_num as usize)].as_mut().unwrap();
@@ -80,7 +68,7 @@ impl Pager {
    }
 
    /// Init the rows of the page to Option::None
-   pub fn init_page_rows(&mut self, page: &mut Option<Page>) {
+   fn init_page_rows( page: &mut Option<Page>) {
       let mut _page: Page = {
          let mut _init_page : UninitPage = unsafe {
             MaybeUninit::uninit().assume_init()
