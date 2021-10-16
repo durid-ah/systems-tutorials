@@ -2,11 +2,11 @@ use bincode;
 use serde::{Serialize, Deserialize};
 
 /// convert the row to a vec<u8>
-pub fn _serialize_row(row: &Row) -> Vec<u8> {
+pub fn serialize_row(row: &Row) -> Vec<u8> {
    bincode::serialize(&row).unwrap()
 }
 
-pub fn _deserialize_row(row: &Vec<u8>) -> Row {
+pub fn deserialize_row(row: &Vec<u8>) -> Row {
    bincode::deserialize(&row).unwrap()
 }
 

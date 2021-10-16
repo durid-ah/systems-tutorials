@@ -1,5 +1,5 @@
 use crate::pager::Pager;
-use super::row::{Row, _serialize_row, _deserialize_row};
+use super::row::{Row, serialize_row, deserialize_row};
 
 use super::size_constants::{
    TABLE_MAX_ROWS
@@ -31,7 +31,7 @@ impl Table {
          return ExecuteResult::TableFull;
       }
 
-      let bin_row = _serialize_row(row);
+      let bin_row = serialize_row(row);
       let table_row = self.get_row(self.num_rows);
       *table_row = Some(bin_row);
 
@@ -44,7 +44,7 @@ impl Table {
          let r = self.get_row(i).clone();
 
          if let Option::Some(row) = r {
-            let deserialized_r = _deserialize_row(&row);
+            let deserialized_r = deserialize_row(&row);
             res.push(deserialized_r);            
          }
       }
