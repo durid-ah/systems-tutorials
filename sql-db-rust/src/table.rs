@@ -1,12 +1,9 @@
 use crate::pager::Pager;
-use std::mem::{self, MaybeUninit};
 use super::row::{Row, _serialize_row, _deserialize_row};
 
 use super::size_constants::{
-   ROWS_PER_PAGE,
    TABLE_MAX_ROWS
 };
-
 
 pub enum ExecuteResult {
    TableFull,
@@ -25,20 +22,8 @@ impl Table {
       return Table{num_rows: 0, pager: _pager}
    }
 
-   /// Return the index of the page where the row number resides
-   fn get_page_idx(&self, row_num: usize) -> usize { return row_num / ROWS_PER_PAGE}
-
-   /// Get the row within the page where the row resides
-   fn get_row_idx(&self, row_num: usize) -> usize { return row_num % ROWS_PER_PAGE }
-
-   // TODO: Fix this mess!!!!
    /// Get a reference to the row in the table based on the row number
-   pub fn get_row(&mut self, row_num: usize) -> &mut Option<Vec<u8>> {
-      let page_num: usize = self.get_page_idx(row_num);
-      let row_idx: usize = self.get_row_idx(row_num);
-
-      self.pager.get_row(page_num, row_idx)
-   }
+   pub fn get_row(&mut self, row_num: usize) -> &mut Option<Vec<u8>> { self.pager.get_row(row_num)}
 
    /// Insert the row into the next available slot
    pub fn insert_row(&mut self, row: &Row) -> ExecuteResult {
@@ -62,7 +47,6 @@ impl Table {
             let deserialized_r = _deserialize_row(&row);
             res.push(deserialized_r);            
          }
-
       }
 
       res
@@ -85,21 +69,6 @@ mod tests {
          }
          _ => assert!(false, "Unable to create row")
       }
-   }
-
-   #[test]
-   fn page_idx_test() {
-      let r = Table::open_db(String::from("test_file.txt"));
-      let first_page_idx = r.get_page_idx(0);
-      let first_page_idx_2 = r.get_page_idx(12);
-      
-      assert_eq!(first_page_idx, 0,
-         "The first row must return the first page in the table"
-      );
-
-      assert_eq!(first_page_idx_2, 0,
-         "The 13th row must return the first page in the table"
-      );
    }
 
    #[test]

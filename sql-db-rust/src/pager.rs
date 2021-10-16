@@ -45,7 +45,15 @@ impl Pager {
       };
    }
 
-   pub fn get_row(&mut self, page_num: usize, row_idx: usize)-> &mut Option<Vec<u8>> {
+   /// Return the index of the page where the row number resides
+   fn get_page_idx(&self, row_num: usize) -> usize { return row_num / ROWS_PER_PAGE}
+   /// Get the row within the page where the row resides
+   fn get_row_idx(&self, row_num: usize) -> usize { return row_num % ROWS_PER_PAGE }
+   
+   pub fn get_row(&mut self, row_num: usize)-> &mut Option<Vec<u8>> {
+      let page_num: usize = self.get_page_idx(row_num);
+      let row_idx: usize = self.get_row_idx(row_num);
+   
       let page = &mut self.pages[(page_num as usize)];
       if let Option::None =  page {
          let mut _page: [Option<Vec<u8>>; ROWS_PER_PAGE] = {
