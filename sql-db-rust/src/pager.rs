@@ -79,7 +79,7 @@ impl Pager {
       &mut res[row_idx]
    }
 
-   /// Init the rows of each page to Option::None
+   /// Init the rows of the page to Option::None
    pub fn init_page_rows(&mut self, page: &mut Option<Page>) {
       let mut _page: Page = {
          let mut _init_page : UninitPage = unsafe {
