@@ -5,6 +5,7 @@ use std::io::{Seek, SeekFrom};
 use super::size_constants::{
    ROWS_PER_PAGE,
    TABLE_MAX_PAGES,
+   PAGE_SIZE
 };
 
 type Page = [Option<Vec<u8>>; ROWS_PER_PAGE];
@@ -58,12 +59,14 @@ impl Pager {
       let page_num: usize = self.get_page_idx(row_num);
       let row_idx: usize = self.get_row_idx(row_num);
    
-      let page = &mut self.pages[(page_num as usize)];
+      let page = &mut self.pages[page_num];
+
       if let Option::None =  page {
-         Pager::init_page_rows(page)
+         Pager::init_page_rows(page);
+         Pager::load_page_from_file(page);
       }
 
-      let res = self.pages[(page_num as usize)].as_mut().unwrap();
+      let res = page.as_mut().unwrap();
       &mut res[row_idx]
    }
 
@@ -73,6 +76,7 @@ impl Pager {
          let mut _init_page : UninitPage = unsafe {
             MaybeUninit::uninit().assume_init()
          };
+
          for r in &mut _init_page[..] {
             *r = MaybeUninit::new(Option::None);
          }
@@ -81,5 +85,10 @@ impl Pager {
       };
 
       *page = Option::Some(_page);
+   }
+
+   fn load_page_from_file(
+      page: &mut Option<Page>, ) {
+
    }
 }
