@@ -63,7 +63,7 @@ impl Pager {
 
       if let Option::None =  page {
          Pager::init_page_rows(page);
-         Pager::load_page_from_file(page);
+         Pager::load_page_from_file(page, self.file_length, &self.file);
       }
 
       let res = page.as_mut().unwrap();
@@ -88,7 +88,7 @@ impl Pager {
    }
 
    fn load_page_from_file(
-      page: &mut Option<Page>, ) {
+      page: &mut Option<Page>, file_length: u64, file: &File) {
 
    }
 }
