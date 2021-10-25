@@ -1,6 +1,6 @@
 use core::mem::{self, MaybeUninit};
 use std::fs::{File, OpenOptions};
-use std::io::{Seek, SeekFrom};
+use std::io::{Seek, SeekFrom, Read};
 
 use super::size_constants::{
    ROWS_PER_PAGE,
@@ -63,7 +63,7 @@ impl Pager {
 
       if let Option::None =  page {
          Pager::init_page_rows(page);
-         Pager::load_page_from_file(page, self.file_length, &self.file);
+         Pager::load_page_from_file(page, self.file_length, &mut self.file, page_num);
       }
 
       let res = page.as_mut().unwrap();
@@ -87,8 +87,29 @@ impl Pager {
       *page = Option::Some(_page);
    }
 
-   fn load_page_from_file(
-      page: &mut Option<Page>, file_length: u64, file: &File) {
+   fn map_bytes_to_rows(page: &mut Option<Page>, buffer: &mut [u8]) {
+      let rows = page.as_mut().unwrap();
+   }
 
+   fn load_page_from_file(
+      page: &mut Option<Page>, file_length: u64, file: &mut File, page_num: usize
+   ) {
+      // number of pages in the file
+      let mut page_count = file_length / PAGE_SIZE;
+      
+      // add a page for the leftover rows at the end
+      if file_length % PAGE_SIZE != 0 {
+         page_count += 1
+      }
+
+      if page_num <= (page_count as usize) {
+         let offset_bytes = (page_num * (PAGE_SIZE as usize)) as u64;
+         let mut read_buf: [u8; (PAGE_SIZE as usize)] = [0; (PAGE_SIZE as usize)]; 
+         let offset = SeekFrom::Start(offset_bytes);
+         
+         // TODO: handle error handling
+         let _ = file.seek(offset);
+         let _ = file.read(&mut read_buf[..]);
+      }
    }
 }
