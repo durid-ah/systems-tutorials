@@ -33,6 +33,30 @@ impl Pager {
       return Pager {file: _file, file_length: _size, pages: _pages}
    }
 
+   pub fn close_pager() {
+
+   }
+
+   fn flush_page() {
+      
+   }
+
+
+   pub fn get_row(&mut self, row_num: usize)-> &mut Option<Vec<u8>> {
+      let page_num: usize = self.get_page_idx(row_num);
+      let row_idx: usize = self.get_row_idx(row_num);
+   
+      let page = &mut self.pages[page_num];
+
+      if let Option::None =  page {
+         Pager::init_page_rows(page);
+         Pager::load_page_from_file(page, self.file_length, &mut self.file, page_num);
+      }
+
+      let res = page.as_mut().unwrap();
+      &mut res[row_idx]
+   }
+
    /// Initialize each page to Option::None
    fn init_pages() -> [Option<Page>; TABLE_MAX_PAGES] {
       return {
@@ -53,24 +77,10 @@ impl Pager {
 
    /// Return the index of the page where the row number resides
    fn get_page_idx(&self, row_num: usize) -> usize { return row_num / ROWS_PER_PAGE}
+   
    /// Get the row within the page where the row resides
    fn get_row_idx(&self, row_num: usize) -> usize { return row_num % ROWS_PER_PAGE }
    
-   pub fn get_row(&mut self, row_num: usize)-> &mut Option<Vec<u8>> {
-      let page_num: usize = self.get_page_idx(row_num);
-      let row_idx: usize = self.get_row_idx(row_num);
-   
-      let page = &mut self.pages[page_num];
-
-      if let Option::None =  page {
-         Pager::init_page_rows(page);
-         Pager::load_page_from_file(page, self.file_length, &mut self.file, page_num);
-      }
-
-      let res = page.as_mut().unwrap();
-      &mut res[row_idx]
-   }
-
    /// Init the rows of the page to Option::None
    fn init_page_rows( page: &mut Option<Page>) {
       let mut _page: Page = {
