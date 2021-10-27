@@ -5,7 +5,8 @@ use std::io::{Seek, SeekFrom, Read};
 use super::size_constants::{
    ROWS_PER_PAGE,
    TABLE_MAX_PAGES,
-   PAGE_SIZE
+   PAGE_SIZE,
+   ROW_SIZE
 };
 
 type Page = [Option<Vec<u8>>; ROWS_PER_PAGE];
@@ -87,8 +88,26 @@ impl Pager {
       *page = Option::Some(_page);
    }
 
-   fn map_bytes_to_rows(page: &mut Option<Page>, buffer: &mut [u8]) {
+   fn map_bytes_to_rows(page: &mut Option<Page>, buffer: &[u8]) {
       let rows = page.as_mut().unwrap();
+      let mut begin = 0;
+      let mut end = ROW_SIZE;
+
+      
+      for i in 0 .. rows.len() {
+         let mut data: Vec<u8> = Vec::with_capacity(ROW_SIZE);
+         for j in begin .. end {
+            data.push(buffer[j])
+         }
+
+         println!("BEGIN INDEX: {:?}", begin);
+         println!("END INDEX: {:?}", end);
+         println!("DATA ROW: {:?}", data);
+
+         rows[i] = Option::Some(data);
+         begin = begin + ROW_SIZE;
+         end = end + ROW_SIZE;
+      }
    }
 
    fn load_page_from_file(
@@ -107,9 +126,10 @@ impl Pager {
          let mut read_buf: [u8; (PAGE_SIZE as usize)] = [0; (PAGE_SIZE as usize)]; 
          let offset = SeekFrom::Start(offset_bytes);
          
-         // TODO: handle error handling
+         // TODO: handle errors
          let _ = file.seek(offset);
          let _ = file.read(&mut read_buf[..]);
+         Pager::map_bytes_to_rows(page, &read_buf);
       }
    }
 }

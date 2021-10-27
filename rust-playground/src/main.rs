@@ -29,4 +29,10 @@ fn main() {
     // let r4s = bincode::serialize(&r4).unwrap();
     // println!("Struct size: {:?}", r4s.len());
     // println!("Struct content: {:?}", r4s);
+
+    let mut s: Vec<i32> = Vec::with_capacity(307);
+    s.push(1);
+    println!("{:?}", s);
+    println!("{:?}", s.capacity());
+    println!("{:?}", s.len());
 }
