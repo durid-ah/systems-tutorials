@@ -13,9 +13,9 @@ type Page = [Option<Vec<u8>>; ROWS_PER_PAGE];
 type UninitPage = [MaybeUninit<Option<Vec<u8>>>; ROWS_PER_PAGE];
 
 pub struct Pager {
-   pub file: File,
-   pub file_length: u64,
-   pub pages: [Option<Page>; TABLE_MAX_PAGES]
+   file: File,
+   file_length: u64,
+   pages: [Option<Page>; TABLE_MAX_PAGES]
 }
 
 impl Pager {
@@ -38,7 +38,7 @@ impl Pager {
    }
 
    fn flush_page() {
-      
+
    }
 
 
