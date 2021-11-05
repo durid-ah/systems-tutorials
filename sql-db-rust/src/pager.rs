@@ -37,8 +37,10 @@ impl Pager {
 
    }
 
-   fn flush_page() {
-
+   fn flush_page(page: &Option<Page>, page_num: usize, file: &mut File) {
+      let page_to_write = page.as_ref().expect("Attempting To Flushing None Page");
+      let offset = Pager::get_page_file_offset(page_num as u64);
+      file.seek(offset);
    }
 
 
@@ -80,6 +82,8 @@ impl Pager {
    
    /// Get the row within the page where the row resides
    fn get_row_idx(&self, row_num: usize) -> usize { return row_num % ROWS_PER_PAGE }
+
+   fn get_page_file_offset(page_num: u64) -> SeekFrom { SeekFrom::Start(page_num * PAGE_SIZE) }
    
    /// Init the rows of the page to Option::None
    fn init_page_rows( page: &mut Option<Page>) {
