@@ -17,10 +17,13 @@ mod statement;
 mod row;
 
 
-fn parse_meta_command(user_input: &String) {
+fn parse_meta_command(user_input: &String, table: &mut Table) {
     let input = user_input.trim_end();
     match input {
-        ".exit" => process::exit(0),
+        ".exit" => {
+            table.close_table();
+            process::exit(0)
+        },
         _ => println!("Unrecognized Meta Command '{}'", input)
     }
 }
@@ -38,7 +41,7 @@ fn main() {
         let first_char = input.chars().next().unwrap();
 
         if first_char == '.' {
-            parse_meta_command(&input);
+            parse_meta_command(&input, &mut internal_db);
             continue;
         }
 
