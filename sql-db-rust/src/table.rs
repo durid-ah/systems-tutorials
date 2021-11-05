@@ -51,6 +51,10 @@ impl Table {
 
       res
    }
+
+   pub fn close_table(&mut self) {
+      self.pager.close_pager(self.num_rows);
+   }
 }
 
 #[cfg(test)]
