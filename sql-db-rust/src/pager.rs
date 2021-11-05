@@ -1,6 +1,7 @@
 use core::mem::{self, MaybeUninit};
 use std::fs::{File, OpenOptions};
-use std::io::{Seek, SeekFrom, Read, Write};
+use std::io::{Seek, SeekFrom, Read, Write, IoSlice};
+use std::vec::Vec;
 
 use super::size_constants::{
    ROWS_PER_PAGE,
@@ -41,10 +42,15 @@ impl Pager {
       let page_to_write = page.as_ref().expect("Attempting To Flushing None Page");
       let offset = Pager::get_page_file_offset(page_num as u64);
       
-      file.seek(offset);
+      let _ = file.seek(offset);
 
       for i in 0..ROWS_PER_PAGE {
-         // file.write(page_to_write[0].unwrap());
+         if page_to_write[i].is_none() {
+            break;
+         }
+         let unwraped_row = page_to_write[i].as_ref().unwrap();
+         let row_slice = IoSlice::new(unwraped_row.as_slice());
+         file.write(&row_slice).expect("unable to write to file");
       }
    }
 
