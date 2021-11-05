@@ -1,6 +1,6 @@
 use core::mem::{self, MaybeUninit};
 use std::fs::{File, OpenOptions};
-use std::io::{Seek, SeekFrom, Read};
+use std::io::{Seek, SeekFrom, Read, Write};
 
 use super::size_constants::{
    ROWS_PER_PAGE,
@@ -40,7 +40,12 @@ impl Pager {
    fn flush_page(page: &Option<Page>, page_num: usize, file: &mut File) {
       let page_to_write = page.as_ref().expect("Attempting To Flushing None Page");
       let offset = Pager::get_page_file_offset(page_num as u64);
+      
       file.seek(offset);
+
+      for i in 0..ROWS_PER_PAGE {
+         // file.write(page_to_write[0].unwrap());
+      }
    }
 
 
