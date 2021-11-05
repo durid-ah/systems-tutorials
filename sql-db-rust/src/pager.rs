@@ -34,8 +34,21 @@ impl Pager {
       return Pager {file: _file, file_length: _size, pages: _pages}
    }
 
-   pub fn close_pager() {
+   pub fn close_pager(&mut self, num_rows: usize) {
+      let full_page_count = num_rows / ROWS_PER_PAGE;
+      let leftover_rows = num_rows % ROWS_PER_PAGE;
 
+      for i in 0..full_page_count {
+         let page = &self.pages[i];
+         Pager::flush_page(page, i, &mut self.file)
+      }
+
+      if leftover_rows != 0 {
+         let page = &self.pages[full_page_count];
+         Pager::flush_page(page, full_page_count, &mut self.file);
+      }
+
+      self.file.sync_all().expect("Unable to finish closing the database");
    }
 
    fn flush_page(page: &Option<Page>, page_num: usize, file: &mut File) {
@@ -94,6 +107,7 @@ impl Pager {
    /// Get the row within the page where the row resides
    fn get_row_idx(&self, row_num: usize) -> usize { return row_num % ROWS_PER_PAGE }
 
+   /// Get a page's offset in the file
    fn get_page_file_offset(page_num: u64) -> SeekFrom { SeekFrom::Start(page_num * PAGE_SIZE) }
    
    /// Init the rows of the page to Option::None
