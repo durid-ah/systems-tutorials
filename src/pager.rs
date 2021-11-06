@@ -139,9 +139,9 @@ impl Pager {
             data.push(buffer[j])
          }
 
-         println!("BEGIN INDEX: {:?}", begin);
-         println!("END INDEX: {:?}", end);
-         println!("DATA ROW: {:?}", data);
+         // println!("BEGIN INDEX: {:?}", begin);
+         // println!("END INDEX: {:?}", end);
+         // println!("DATA ROW: {:?}", data);
 
          rows[i] = Option::Some(data);
          begin = begin + ROW_SIZE;

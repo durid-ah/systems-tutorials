@@ -34,7 +34,8 @@ impl Table {
       let bin_row = serialize_row(row);
       let table_row = self.get_row(self.num_rows);
       *table_row = Some(bin_row);
-
+      self.num_rows += 1;
+      
       ExecuteResult::Success
    }
 
