@@ -12,6 +12,7 @@ use super::size_constants::{
 
 // TODO: Fix page numbering
 // TODO: Page reading from the db is only happening at get_row
+// TODO: Does the c version handle things the same way too
 type Page = [Option<Vec<u8>>; ROWS_PER_PAGE];
 type UninitPage = [MaybeUninit<Option<Vec<u8>>>; ROWS_PER_PAGE];
 
