@@ -2,7 +2,8 @@ use crate::pager::Pager;
 use super::row::{Row, serialize_row, deserialize_row};
 
 use super::size_constants::{
-   TABLE_MAX_ROWS
+   TABLE_MAX_ROWS,
+   ROW_SIZE
 };
 
 pub enum ExecuteResult {
@@ -19,7 +20,8 @@ impl Table {
    /// Create the table
    pub fn open_db(file_name: String) -> Table {
       let _pager = Pager::open_pager(file_name);
-      return Table{num_rows: 0, pager: _pager}
+      let num_rows = (_pager.file_length as usize) / ROW_SIZE;
+      return Table{num_rows, pager: _pager}
    }
 
    /// Get a reference to the row in the table based on the row number

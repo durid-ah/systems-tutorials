@@ -12,13 +12,13 @@ use super::size_constants::{
 
 // TODO: Fix page numbering
 // TODO: Page reading from the db is only happening at get_row
-// TODO: Does the c version handle things the same way too
+// TODO: Does the c version handle things the same way too?
 type Page = [Option<Vec<u8>>; ROWS_PER_PAGE];
 type UninitPage = [MaybeUninit<Option<Vec<u8>>>; ROWS_PER_PAGE];
 
 pub struct Pager {
    file: File,
-   file_length: u64,
+   pub file_length: u64,
    pages: [Option<Page>; TABLE_MAX_PAGES]
 }
 
@@ -26,7 +26,7 @@ impl Pager {
    pub fn open_pager(file_name: String) -> Pager {
       let mut _file = OpenOptions::new()
          .read(true)
-         .write(true)
+          .write(true)
          .create(true)
          .open(file_name)
          .unwrap();
@@ -62,7 +62,7 @@ impl Pager {
 
       for i in 0..ROWS_PER_PAGE {
          if page_to_write[i].is_none() {
-            break;
+            continue;
          }
          let unwraped_row = page_to_write[i].as_ref().unwrap();
          let row_slice = IoSlice::new(unwraped_row.as_slice());
