@@ -3,11 +3,11 @@ use serde::{Serialize, Deserialize};
 
 /// convert the row to a vec<u8>
 pub fn serialize_row(row: &Row) -> Vec<u8> {
-   bincode::serialize(&row).unwrap()
+   bincode::serialize(&row).expect("Unable to serialize data")
 }
 
 pub fn deserialize_row(row: &Vec<u8>) -> Row {
-   bincode::deserialize(&row).unwrap()
+   bincode::deserialize(&row).expect("Unable to deserialize data")
 }
 
 #[derive(Serialize, Deserialize, Debug)]

@@ -70,7 +70,6 @@ impl Pager {
       }
    }
 
-
    pub fn get_row(&mut self, row_num: usize)-> &mut Option<Vec<u8>> {
       let page_num: usize = self.get_page_idx(row_num);
       let row_idx: usize = self.get_row_idx(row_num);
@@ -130,25 +129,39 @@ impl Pager {
       *page = Option::Some(_page);
    }
 
-   fn map_bytes_to_rows(page: &mut Option<Page>, buffer: &[u8]) {
+   fn map_bytes_to_rows(page: &mut Option<Page>, buffer: &[u8], bytes_read: usize) {
       let rows = page.as_mut().unwrap();
       let mut begin = 0;
       let mut end = ROW_SIZE;
+      let mut end_mapping = false;
 
-      
+      println!("BUFFER_SIZE: {:?}", buffer.len());
+
       for i in 0 .. rows.len() {
          let mut data: Vec<u8> = Vec::with_capacity(ROW_SIZE);
          for j in begin .. end {
-            data.push(buffer[j])
+            if j >= bytes_read {
+               end_mapping = true;
+               break;
+            }
+            data.push(buffer[j]);
          }
 
-         // println!("BEGIN INDEX: {:?}", begin);
-         // println!("END INDEX: {:?}", end);
-         // println!("DATA ROW: {:?}", data);
+         println!("DATA: {:?}", data);
+         println!("BEGIN INDEX: {:?}", begin);
+         println!("END INDEX: {:?}", end);
+
+         if data.len() == 0 {
+            break;
+         }
 
          rows[i] = Option::Some(data);
          begin = begin + ROW_SIZE;
          end = end + ROW_SIZE;
+
+         if end_mapping {
+            break;
+         }
       }
    }
 
@@ -157,6 +170,8 @@ impl Pager {
    ) {
       // number of pages in the file
       let mut page_count = file_length / PAGE_SIZE;
+
+      println!("LOADING PAGE: {:?}", page_num);
       
       // add a page for the leftover rows at the end
       if file_length % PAGE_SIZE != 0 {
@@ -170,8 +185,9 @@ impl Pager {
          
          // TODO: handle errors
          let _ = file.seek(offset);
-         let _ = file.read(&mut read_buf[..]);
-         Pager::map_bytes_to_rows(page, &read_buf);
+         let bytes_read = file.read(&mut read_buf[..]);
+         println!("Amount Read: {:?}", bytes_read);
+         Pager::map_bytes_to_rows(page, &read_buf, bytes_read.unwrap());
       }
    }
 }
