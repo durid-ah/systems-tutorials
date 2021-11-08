@@ -33,6 +33,8 @@ impl Table {
          return ExecuteResult::TableFull;
       }
 
+      println!("Executing INSERT");
+
       let bin_row = serialize_row(row);
       let table_row = self.get_row(self.num_rows);
       *table_row = Some(bin_row);

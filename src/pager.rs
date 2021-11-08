@@ -10,9 +10,8 @@ use super::size_constants::{
    ROW_SIZE
 };
 
-// TODO: Fix page numbering
-// TODO: Page reading from the db is only happening at get_row
-// TODO: Does the c version handle things the same way too?
+// INFO: it seems like the files are stored without padding at the end
+// TODO: Check the serialization/deserialization
 type Page = [Option<Vec<u8>>; ROWS_PER_PAGE];
 type UninitPage = [MaybeUninit<Option<Vec<u8>>>; ROWS_PER_PAGE];
 
@@ -55,6 +54,7 @@ impl Pager {
    }
 
    fn flush_page(page: &Option<Page>, page_num: usize, file: &mut File) {
+      println!("flush_page()");
       let page_to_write = page.as_ref().expect("Attempting To Flushing None Page");
       let offset = Pager::get_page_file_offset(page_num as u64);
       
@@ -62,17 +62,28 @@ impl Pager {
 
       for i in 0..ROWS_PER_PAGE {
          if page_to_write[i].is_none() {
+            println!("Skipping row: {:?}", i);
             continue;
          }
+
          let unwraped_row = page_to_write[i].as_ref().unwrap();
+
+         println!("Writting row: {:?}", i);
+         println!("Writting row data: \n {:?}", unwraped_row);
+
          let row_slice = IoSlice::new(unwraped_row.as_slice());
          file.write(&row_slice).expect("unable to write to file");
       }
    }
 
    pub fn get_row(&mut self, row_num: usize)-> &mut Option<Vec<u8>> {
+      println!("get_row()");
       let page_num: usize = self.get_page_idx(row_num);
       let row_idx: usize = self.get_row_idx(row_num);
+
+      println!("Getting Page #: {:?}", page_num);
+      println!("Getting Row IDX: {:?}", row_idx);
+
    
       let page = &mut self.pages[page_num];
 
