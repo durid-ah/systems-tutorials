@@ -55,7 +55,7 @@ impl Pager {
 
    fn flush_page(page: &Option<Page>, page_num: usize, file: &mut File) {
       println!("flush_page()");
-      let page_to_write = page.as_ref().expect("Attempting To Flushing None Page");
+      let page_to_write = page.as_ref().expect("Attempting To Flush None Page");
       let offset = Pager::get_page_file_offset(page_num as u64);
       
       let _ = file.seek(offset);
