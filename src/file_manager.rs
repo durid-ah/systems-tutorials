@@ -35,13 +35,27 @@ impl FileManager {
       return u16::from_le_bytes(size_buffer);
    }
 
-   // TODO: Figure out how to put the parsed  rows  into an unitialized  page
-   pub fn read_page(&mut self) {
+   // TODO: Add a seek page by number function
+   
+   // TODO: Convert the code below to load a single row (load_next_row()) ?
+   // TODO: The row might be a None if end of file reached
+   // TODO: What will the end of page implications be?
+
+   // Should this only return a row a time and initialize page in pager?
+   // TODO: Figure out how to put the parsed rows into an unitialized  page
+   // TODO: Refactor to iterate through every row and load its data from the file if it exists
+   pub fn load_page(&mut self) {
+      // TODO: Seek file to the right page number
       let mut file_iter = self.file.borrow_mut()
          .bytes()
          .peekable();
+
+      // TODO: Create MaybeUninit Page
  
-       while !file_iter.peek().is_none() {
+      // TODO: Use init_pages() as inspiration
+      // TODO: Change loop to iterate uninit page and read each rows data into a vector
+      // TODO: Take into account end of file possibility and setting rows to None
+      while !file_iter.peek().is_none() {
          let row_size = FileManager::read_row_size_header(&mut file_iter);
          let row: Vec<u8> = Vec::with_capacity(row_size as usize);
          for i in 0..row_size {
