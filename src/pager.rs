@@ -107,7 +107,7 @@ impl Pager {
          // set each page to Option::None
          for elem in &mut _pages[..] {
             *elem = MaybeUninit::new(Option::None);
-         }
+         } 
 
          //remove the MaybeUninit part of the type to make it a an option array
          unsafe { mem::transmute::<_, [Option<Page>; TABLE_MAX_PAGES]>(_pages)}
