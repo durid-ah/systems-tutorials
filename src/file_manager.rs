@@ -37,6 +37,7 @@ impl FileManager {
    }
 
    pub fn seek_to_page(&mut self, page_num: u64) {
+      //TODO: Move offset calculater from pager
       let offset_bytes = page_num * PAGE_SIZE;
       let offset = SeekFrom::Start(offset_bytes);
       
@@ -49,17 +50,18 @@ impl FileManager {
          .peekable();
 
       let row_size = FileManager::read_row_size_header(&mut file_iter);
+      println!("Reading:Row_Size:{}", row_size);
 
       if row_size <= 0 {
          return None;
       }
 
-      let row: Vec<u8> = Vec::with_capacity(row_size as usize);
+      let mut row: Vec<u8> = Vec::with_capacity(row_size as usize);
       
       for i in 0..row_size {
          let file_byte = file_iter.next()
             .expect(
-               format!("FILE CORRUPTION: Invalid number of row bytes expected {} got {}", row_size, i)
+               format!("FILE CORRUPTION: Invalid number of row bytes expected {} got {}", row_size, i).as_str()
             ).unwrap();
 
          row.push(file_byte)
@@ -68,35 +70,11 @@ impl FileManager {
       Some(row)
    }
 
-   // TODO: Convert the code below to load a single row (load_next_row()) ?
-   // TODO: The row might be a None if end of file reached
-   // TODO: What will the end of page implications be?
+   pub fn write_row(&mut self, row: &Vec<u8>, size: u16) {
+      println!("Writing:Row_Size:{}", size);
 
-   // Should this only return a row a time and initialize page in pager?
-   // TODO: Figure out how to put the parsed rows into an unitialized  page
-   // TODO: Refactor to iterate through every row and load its data from the file if it exists
-   pub fn load_page(&mut self) {
-      // TODO: Seek file to the right page number
-      let mut file_iter = self.file.borrow_mut()
-         .bytes()
-         .peekable();
-
-      // TODO: Create MaybeUninit Page
- 
-      // TODO: Use init_pages() as inspiration
-      // TODO: Change loop to iterate uninit page and read each rows data into a vector
-      // TODO: Take into account end of file possibility and setting rows to None
-      while !file_iter.peek().is_none() {
-         let row_size = FileManager::read_row_size_header(&mut file_iter);
-         let row: Vec<u8> = Vec::with_capacity(row_size as usize);
-         for i in 0..row_size {
-            let file_byte = file_iter.next()
-               .expect(
-                  format!("Invalid number of row bytes expected {} got {}", row_size, i)
-               ).unwrap();
-
-            row.push(file_byte)
-         }
-      }
+      let row_slice = IoSlice::new(row.as_slice());
+      self.file.write(&size.to_le_bytes()).expect("unable to read row size");
+      self.file.write(&row_slice).expect("unable to read row");
    }
 }

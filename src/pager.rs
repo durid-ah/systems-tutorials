@@ -1,6 +1,6 @@
 use core::mem::{self, MaybeUninit};
 use std::fs::{File, OpenOptions};
-use std::io::{Seek, SeekFrom, Read, Write, IoSlice};
+use std::io::{Seek, SeekFrom};
 use std::vec::Vec;
 use super::file_manager::FileManager;
 
@@ -8,7 +8,6 @@ use super::size_constants::{
    ROWS_PER_PAGE,
    TABLE_MAX_PAGES,
    PAGE_SIZE,
-   ROW_SIZE
 };
 
 // INFO: it seems like the files are stored without padding at the end
@@ -29,7 +28,7 @@ impl Pager {
          .read(true)
          .write(true)
          .create(true)
-         .open(file_name)
+         .open("null.txt")
          .unwrap();
 
       let _size = _file.seek(SeekFrom::End(0)).unwrap();
@@ -45,25 +44,25 @@ impl Pager {
 
       for i in 0..(full_page_count as usize) {
          let page = &self.pages[i];
-         Pager::flush_page(page, i as u64, &mut self.file)
+         Pager::flush_page(page, i as u64, &mut self.file_mgr)
       }
 
       if leftover_rows != 0 {
          let page = &self.pages[full_page_count as usize];
-         Pager::flush_page(page, full_page_count, &mut self.file);
+         Pager::flush_page(page, full_page_count, &mut self.file_mgr);
       }
 
       self.file.sync_all().expect("Unable to finish closing the database");
    }
 
-   fn flush_page(page: &Option<Page>, page_num: u64, file: &mut File) {
+   fn flush_page(page: &Option<Page>, page_num: u64, file_mgr: &mut FileManager) {
       println!("flush_page()");
       let page_to_write = page.as_ref().expect("Attempting To Flush None Page");
-      let offset = Pager::get_page_file_offset(page_num as u64);
       
-      let _ = file.seek(offset);
+      let _ = file_mgr.seek_to_page(page_num);
 
       for i in 0..(ROWS_PER_PAGE as usize) {
+         // TODO: use pattern matching?
          if page_to_write[i].is_none() {
             println!("Skipping row: {:?}", i);
             continue;
@@ -71,11 +70,7 @@ impl Pager {
 
          let unwraped_row = page_to_write[i].as_ref().unwrap();
 
-         println!("Writting row: {:?}", i);
-         println!("Writting row data: \n {:?}", unwraped_row);
-
-         let row_slice = IoSlice::new(unwraped_row.as_slice());
-         file.write(&row_slice).expect("unable to write to file");
+         file_mgr.write_row(unwraped_row, unwraped_row.len() as u16)
       }
    }
 
@@ -90,7 +85,8 @@ impl Pager {
       let page = &mut self.pages[page_num];
 
       if let Option::None =  page {
-         Pager::init_page_rows(page);
+         self.file_mgr.seek_to_page(page_num as u64);
+         Pager::init_page_rows(page, &mut self.file_mgr);
       }
 
       let res = page.as_mut().unwrap();
@@ -125,81 +121,20 @@ impl Pager {
    fn get_page_file_offset(page_num: u64) -> SeekFrom { SeekFrom::Start(page_num * PAGE_SIZE) }
    
    /// Init the rows of the page to Option::None
-   fn init_page_rows(page: &mut Option<Page>) {
+   fn init_page_rows(page: &mut Option<Page>, file_mgr: &mut FileManager) {
       let mut _page: Page = {
          let mut _init_page : UninitPage = unsafe {
             MaybeUninit::uninit().assume_init()
          };
 
          for r in &mut _init_page[..] {
-            *r = MaybeUninit::new(Option::None);
+            let row = file_mgr.read_row();
+            *r = MaybeUninit::new(row);
          }
          
          unsafe {mem::transmute(_init_page)}
       };
 
       *page = Option::Some(_page);
-   }
-
-   fn map_bytes_to_rows(page: &mut Option<Page>, buffer: &[u8], bytes_read: usize) {
-      let rows = page.as_mut().unwrap();
-      let mut begin = 0;
-      let mut end = ROW_SIZE;
-      let mut end_mapping = false;
-
-      println!("BUFFER_SIZE: {:?}", buffer.len());
-
-      for i in 0 .. rows.len() {
-         let mut data: Vec<u8> = Vec::with_capacity(ROW_SIZE as usize);
-         for j in begin .. end {
-            if j as usize  >= bytes_read {
-               end_mapping = true;
-               break;
-            }
-            data.push(buffer[j as usize]);
-         }
-
-         println!("DATA: {:?}", data);
-         println!("BEGIN INDEX: {:?}", begin);
-         println!("END INDEX: {:?}", end);
-
-         if data.len() == 0 {
-            break;
-         }
-
-         rows[i] = Option::Some(data);
-         begin = begin + ROW_SIZE;
-         end = end + ROW_SIZE;
-
-         if end_mapping {
-            break;
-         }
-      }
-   }
-
-   fn load_page_from_file(
-      page: &mut Option<Page>, file_length: u64, file: &mut File, page_num: usize
-   ) {
-      // number of pages in the file
-      let mut page_count = file_length / PAGE_SIZE;
-
-      println!("LOADING PAGE: {:?}", page_num);
-      
-      // add a page for the leftover rows at the end
-      if file_length % PAGE_SIZE != 0 {
-         page_count += 1
-      }
-
-      if page_num <= (page_count as usize) {
-         let offset_bytes = (page_num * (PAGE_SIZE as usize)) as u64;
-         let mut read_buf: [u8; (PAGE_SIZE as usize)] = [0; (PAGE_SIZE as usize)]; 
-         let offset = SeekFrom::Start(offset_bytes);
-         
-         // TODO: handle errors
-         let _ = file.seek(offset);
-         let bytes_read = file.read(&mut read_buf[..]);
-         println!("Amount Read: {:?}", bytes_read);
-         Pager::map_bytes_to_rows(page, &read_buf, bytes_read.unwrap());
-      }
    }
 }
