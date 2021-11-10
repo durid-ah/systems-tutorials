@@ -12,7 +12,7 @@ pub enum ExecuteResult {
 }
 
 pub struct Table {
-   pub num_rows: usize,
+   pub num_rows: u64,
    pub pager: Pager
 }
 
@@ -20,12 +20,12 @@ impl Table {
    /// Create the table
    pub fn open_db(file_name: String) -> Table {
       let _pager = Pager::open_pager(file_name);
-      let num_rows = (_pager.file_length as usize) / ROW_SIZE;
+      let num_rows = _pager.file_length / ROW_SIZE;
       return Table{num_rows, pager: _pager}
    }
 
    /// Get a reference to the row in the table based on the row number
-   pub fn get_row(&mut self, row_num: usize) -> &mut Option<Vec<u8>> { self.pager.get_row(row_num)}
+   pub fn get_row(&mut self, row_num: u64) -> &mut Option<Vec<u8>> { self.pager.get_row(row_num)}
 
    /// Insert the row into the next available slot
    pub fn insert_row(&mut self, row: &Row) -> ExecuteResult {
