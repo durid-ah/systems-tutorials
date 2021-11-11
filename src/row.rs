@@ -5,9 +5,6 @@ use serde::{Serialize, Deserialize};
 pub fn serialize_row(row: &Row) -> Vec<u8> {
    let res = bincode::serialize(&row).expect("Unable to serialize data");
    
-   println!("Serializing row: \n{:?}", res);
-   println!("Serialized size: {:?}", res.len());
-
    return res;
 }
 

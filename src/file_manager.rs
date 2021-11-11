@@ -51,13 +51,11 @@ impl FileManager {
          .peekable();
 
       let row_size = FileManager::read_two_bytes(&mut file_iter);
-
       if row_size <= 0 {
          return None;
       }
 
-      let mut row: Vec<u8> = Vec::with_capacity(row_size as usize);
-      
+      let mut row: Vec<u8> = Vec::with_capacity(row_size as usize);  
       for i in 0..row_size {
          let file_byte = file_iter.next()
             .expect(

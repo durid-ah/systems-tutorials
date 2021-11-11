@@ -19,8 +19,6 @@ impl DBConfig {
          .open("dbConfig.json")
          .unwrap()
          .read_to_string(&mut config_str);
-
-      println!("{:?}", config_str);
  
       if config_str.len() == 0 {
          return DBConfig{num_rows: 0}
