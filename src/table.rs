@@ -44,7 +44,7 @@ impl Table {
    pub fn select_rows(&mut self) -> Vec<Row> {
       let mut res: Vec<Row> = Vec::new();
       for i in 0..(self.num_rows + 1) {
-         let r = self.get_row(i).clone(); //TODO: Change to borrow?
+         let r = self.get_row(i).as_ref();
 
          if let Option::Some(row) = r {
             let deserialized_r = deserialize_row(&row);
