@@ -38,7 +38,6 @@ impl FileManager {
    }
 
    pub fn seek_to_page(&mut self, page_num: u64) {
-      //TODO: Move offset calculator from pager
       let offset_bytes = page_num * PAGE_SIZE;
       let offset = SeekFrom::Start(offset_bytes);
       

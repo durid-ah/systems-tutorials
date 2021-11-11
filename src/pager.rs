@@ -53,15 +53,12 @@ impl Pager {
       
       let _ = file_mgr.seek_to_page(page_num);
 
-      for i in 0..(ROWS_PER_PAGE as usize) {
-         // TODO: use pattern matching?
-         if page_to_write[i].is_none() {
-            continue;
+      for i in 0..(ROWS_PER_PAGE as usize) {         
+         match page_to_write[i].as_ref() {
+            Some(unwrapped_row) =>
+               file_mgr.write_row(unwrapped_row, unwrapped_row.len() as u16),
+            None => continue
          }
-
-         let unwraped_row = page_to_write[i].as_ref().unwrap();
-
-         file_mgr.write_row(unwraped_row, unwraped_row.len() as u16)
       }
     }
 

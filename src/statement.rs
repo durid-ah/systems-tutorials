@@ -50,5 +50,3 @@ impl Statement {
       }
    }
 }
-
-// TODO: Test parse user input
