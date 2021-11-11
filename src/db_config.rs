@@ -1,19 +1,21 @@
 use serde::{Deserialize, Serialize};
-use serde_json::Result;
-use std::fs::{File, OpenOptions};
+use std::fs::OpenOptions;
 use std::io::{Write, Read};
 
 #[derive(Serialize, Deserialize)]
 pub struct DBConfig {
-   pub num_rows: u16
+   pub num_rows: u64
 }
 
 impl DBConfig {
+   // TODO: Add a way to differentiate configs for different files
    pub fn load() -> DBConfig {
       let mut config_str = String::new();
 
       let _ = OpenOptions::new()
          .read(true)
+         .write(true)
+         .create(true)
          .open("dbConfig.json")
          .unwrap()
          .read_to_string(&mut config_str);
@@ -28,7 +30,7 @@ impl DBConfig {
          .unwrap();
    }
 
-   pub fn save(config: DBConfig) {
+   pub fn save(config: &DBConfig) {
       let json = serde_json::to_string(&config).unwrap();
 
       let _ = OpenOptions::new()

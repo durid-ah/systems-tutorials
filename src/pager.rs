@@ -1,20 +1,20 @@
 use core::mem::{self, MaybeUninit};
 use std::vec::Vec;
+
 use super::file_manager::FileManager;
+use super::db_config::DBConfig;
 
 use super::size_constants::{
    ROWS_PER_PAGE,
    TABLE_MAX_PAGES,
-   ROW_SIZE,
 };
 
-// INFO: it seems like the files are stored without padding at the end
-// TODO: Check the serialization/deserialization
 type Page = [Option<Vec<u8>>; ROWS_PER_PAGE as usize];
 type UninitPage = [MaybeUninit<Option<Vec<u8>>>; ROWS_PER_PAGE as usize];
 
 pub struct Pager {
    file_mgr: FileManager,
+   config: DBConfig,
    pages: [Option<Page>; TABLE_MAX_PAGES as usize]
 }
 
@@ -22,11 +22,12 @@ impl Pager {
    pub fn open_pager(file_name: String) -> Pager {
       let pages = Pager::init_pages();
       let file_mgr = FileManager::new(file_name);
+      let config = DBConfig::load();
       
-      Pager { pages, file_mgr}
+      Pager { pages, file_mgr, config}
    }
 
-   pub fn calculate_num_rows(&self) -> u64 { self.file_mgr.file_length / ROW_SIZE }
+   pub fn calculate_num_rows(&self) -> u64 { self.config.num_rows }
 
    pub fn close_pager(&mut self, num_rows: u64) {
       let full_page_count = num_rows / ROWS_PER_PAGE;
@@ -42,6 +43,8 @@ impl Pager {
          Pager::flush_page(page, full_page_count, &mut self.file_mgr);
       }
 
+      self.config.num_rows = num_rows;
+      DBConfig::save(&self.config);
       self.file_mgr.close_file()
    }
 
@@ -62,7 +65,7 @@ impl Pager {
 
          file_mgr.write_row(unwraped_row, unwraped_row.len() as u16)
       }
-   }
+    }
 
    pub fn get_row(&mut self, row_num: u64)-> &mut Option<Vec<u8>> {
       println!("get_row()");
