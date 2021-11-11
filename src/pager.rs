@@ -1,13 +1,10 @@
 use core::mem::{self, MaybeUninit};
-use std::fs::{File, OpenOptions};
-use std::io::{Seek, SeekFrom};
 use std::vec::Vec;
 use super::file_manager::FileManager;
 
 use super::size_constants::{
    ROWS_PER_PAGE,
    TABLE_MAX_PAGES,
-   PAGE_SIZE,
    ROW_SIZE,
 };
 
@@ -109,9 +106,6 @@ impl Pager {
    
    /// Get the row within the page where the row resides
    fn get_row_idx(&self, row_num: u64) -> u64 { return row_num % ROWS_PER_PAGE }
-
-   /// Get a page's offset in the file
-   fn get_page_file_offset(page_num: u64) -> SeekFrom { SeekFrom::Start(page_num * PAGE_SIZE) }
    
    /// Init the rows of the page to Option::None
    fn init_page_rows(page: &mut Option<Page>, file_mgr: &mut FileManager) {
