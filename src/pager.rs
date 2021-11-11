@@ -8,6 +8,7 @@ use super::size_constants::{
    ROWS_PER_PAGE,
    TABLE_MAX_PAGES,
    PAGE_SIZE,
+   ROW_SIZE,
 };
 
 // INFO: it seems like the files are stored without padding at the end
@@ -16,27 +17,19 @@ type Page = [Option<Vec<u8>>; ROWS_PER_PAGE as usize];
 type UninitPage = [MaybeUninit<Option<Vec<u8>>>; ROWS_PER_PAGE as usize];
 
 pub struct Pager {
-   file: File,
    file_mgr: FileManager,
-   pub file_length: u64,
    pages: [Option<Page>; TABLE_MAX_PAGES as usize]
 }
 
 impl Pager {
    pub fn open_pager(file_name: String) -> Pager {
-      let mut _file = OpenOptions::new()
-         .read(true)
-         .write(true)
-         .create(true)
-         .open("null.txt")
-         .unwrap();
-
-      let _size = _file.seek(SeekFrom::End(0)).unwrap();
-      let _pages = Pager::init_pages();
+      let pages = Pager::init_pages();
       let file_mgr = FileManager::new(file_name);
       
-      return Pager {file: _file, file_length: _size, pages: _pages, file_mgr}
+      Pager { pages, file_mgr}
    }
+
+   pub fn calculate_num_rows(&self) -> u64 { self.file_mgr.file_length / ROW_SIZE }
 
    pub fn close_pager(&mut self, num_rows: u64) {
       let full_page_count = num_rows / ROWS_PER_PAGE;
@@ -52,7 +45,7 @@ impl Pager {
          Pager::flush_page(page, full_page_count, &mut self.file_mgr);
       }
 
-      self.file.sync_all().expect("Unable to finish closing the database");
+      self.file_mgr.close_file()
    }
 
    fn flush_page(page: &Option<Page>, page_num: u64, file_mgr: &mut FileManager) {
