@@ -49,7 +49,6 @@ impl Pager {
    }
 
    fn flush_page(page: &Option<Page>, page_num: u64, file_mgr: &mut FileManager) {
-      println!("flush_page()");
       let page_to_write = page.as_ref().expect("Attempting To Flush None Page");
       
       let _ = file_mgr.seek_to_page(page_num);
@@ -57,7 +56,6 @@ impl Pager {
       for i in 0..(ROWS_PER_PAGE as usize) {
          // TODO: use pattern matching?
          if page_to_write[i].is_none() {
-            println!("Skipping row: {:?}", i);
             continue;
          }
 
@@ -67,6 +65,7 @@ impl Pager {
       }
     }
 
+   //TODO: change from zero indexed?
    pub fn get_row(&mut self, row_num: u64)-> &mut Option<Vec<u8>> {
       println!("get_row()");
       let page_num: usize = self.get_page_idx(row_num) as usize;

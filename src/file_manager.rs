@@ -21,19 +21,7 @@ impl FileManager {
 
       let file_length = file.seek(SeekFrom::End(0)).unwrap();
 
-      println!("File Length: {}", file_length);
       return FileManager {file, file_length}
-   }
-
-   fn read_row_numbers(&mut self) -> u16 {
-      self.file.seek(SeekFrom::Start(0))
-         .expect("Unable to seek to beginning");
-
-      let mut file_iter = self.file.borrow_mut()
-         .bytes()
-         .peekable();
-
-      return FileManager::read_two_bytes(&mut file_iter);
    }
 
    fn read_two_bytes(iter: &mut Peekable<Bytes<&mut File>>) -> u16 {
@@ -63,7 +51,6 @@ impl FileManager {
          .peekable();
 
       let row_size = FileManager::read_two_bytes(&mut file_iter);
-      println!("Reading:Row_Size:{}", row_size);
 
       if row_size <= 0 {
          return None;
@@ -84,8 +71,6 @@ impl FileManager {
    }
 
    pub fn write_row(&mut self, row: &Vec<u8>, size: u16) {
-      println!("Writing:Row_Size:{}", size);
-
       let row_slice = IoSlice::new(row.as_slice());
       self.file.write(&size.to_le_bytes()).expect("unable to read row size");
       self.file.write(&row_slice).expect("unable to read row");

@@ -3,7 +3,6 @@ use super::row::{Row, serialize_row, deserialize_row};
 
 use super::size_constants::{
    TABLE_MAX_ROWS,
-   ROW_SIZE
 };
 
 pub enum ExecuteResult {
@@ -22,9 +21,6 @@ impl Table {
       let pager = Pager::open_pager(file_name);
       let num_rows = pager.calculate_num_rows();
 
-      println!("Table Initialized");
-      println!("Table ROW #: {}", num_rows);
-
       Table{num_rows, pager}
    }
 
@@ -36,8 +32,6 @@ impl Table {
       if self.num_rows >= TABLE_MAX_ROWS {
          return ExecuteResult::TableFull;
       }
-
-      println!("Executing INSERT");
 
       let bin_row = serialize_row(row);
       let table_row = self.get_row(self.num_rows);
