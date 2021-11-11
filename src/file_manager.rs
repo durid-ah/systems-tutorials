@@ -20,10 +20,23 @@ impl FileManager {
          .unwrap();
 
       let file_length = file.seek(SeekFrom::End(0)).unwrap();
+
+      println!("File Length: {}", file_length);
       return FileManager {file, file_length}
    }
 
-   fn read_row_size_header(iter: &mut Peekable<Bytes<&mut File>>) -> u16{
+   fn read_row_numbers(&mut self) -> u16 {
+      self.file.seek(SeekFrom::Start(0))
+         .expect("Unable to seek to beginning");
+
+      let mut file_iter = self.file.borrow_mut()
+         .bytes()
+         .peekable();
+
+      return FileManager::read_two_bytes(&mut file_iter);
+   }
+
+   fn read_two_bytes(iter: &mut Peekable<Bytes<&mut File>>) -> u16 {
       let mut size_buffer :[u8; 2] = [0; 2];
       size_buffer[0] = iter.next()
          .unwrap_or(Ok(0))
@@ -37,7 +50,7 @@ impl FileManager {
    }
 
    pub fn seek_to_page(&mut self, page_num: u64) {
-      //TODO: Move offset calculater from pager
+      //TODO: Move offset calculator from pager
       let offset_bytes = page_num * PAGE_SIZE;
       let offset = SeekFrom::Start(offset_bytes);
       
@@ -49,7 +62,7 @@ impl FileManager {
          .bytes()
          .peekable();
 
-      let row_size = FileManager::read_row_size_header(&mut file_iter);
+      let row_size = FileManager::read_two_bytes(&mut file_iter);
       println!("Reading:Row_Size:{}", row_size);
 
       if row_size <= 0 {
@@ -76,5 +89,9 @@ impl FileManager {
       let row_slice = IoSlice::new(row.as_slice());
       self.file.write(&size.to_le_bytes()).expect("unable to read row size");
       self.file.write(&row_slice).expect("unable to read row");
+   }
+
+   pub fn close_file(&mut self) {
+      self.file.sync_all().expect("Unable to finish closing the database");
    }
 }
