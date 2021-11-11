@@ -9,6 +9,7 @@ use statement_handler::{
 };
 
 mod file_manager;
+mod db_config;
 mod size_constants;
 mod statement_handler;
 mod statement_enums;
@@ -16,7 +17,6 @@ mod table;
 mod pager;
 mod statement;
 mod row;
-
 
 fn parse_meta_command(user_input: &String, table: &mut Table) {
     let input = user_input.trim_end();
