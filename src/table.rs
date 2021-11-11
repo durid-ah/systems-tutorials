@@ -19,9 +19,13 @@ pub struct Table {
 impl Table {
    /// Create the table
    pub fn open_db(file_name: String) -> Table {
-      let _pager = Pager::open_pager(file_name);
-      let num_rows = _pager.file_length / ROW_SIZE;
-      return Table{num_rows, pager: _pager}
+      let pager = Pager::open_pager(file_name);
+      let num_rows = pager.calculate_num_rows();
+
+      println!("Table Initialized");
+      println!("Table ROW #: {}", num_rows);
+
+      Table{num_rows, pager}
    }
 
    /// Get a reference to the row in the table based on the row number
