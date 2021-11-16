@@ -5,7 +5,8 @@ use std::io::{Write, Read};
 
 #[derive(Serialize, Deserialize)]
 pub struct DBConfig {
-   pub num_rows: u64
+   pub num_rows: u64,
+   pub path: PathBuf
 }
 
 impl DBConfig {
@@ -16,12 +17,12 @@ impl DBConfig {
          .read(true)
          .write(true)
          .create(true)
-         .open(path)
+         .open(&path)
          .unwrap()
          .read_to_string(&mut config_str);
  
       if config_str.len() == 0 {
-         return DBConfig{num_rows: 0}
+         return DBConfig{num_rows: 0, path}
       }
 
       return serde_json::from_str(config_str.as_str())
@@ -33,7 +34,7 @@ impl DBConfig {
 
       let _ = OpenOptions::new()
          .write(true)
-         .open("dbConfig.json")
+         .open(&config.path)
          .unwrap()
          .write_all(json.as_bytes());
    }
