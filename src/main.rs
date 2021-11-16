@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::io::{stdin, stdout, Write};
 use std::process;
 use statement_enums::PrepareResult;
