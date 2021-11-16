@@ -8,6 +8,7 @@ use statement_handler::{
     execute_statement,
 };
 
+mod path_parser;
 mod file_manager;
 mod db_config;
 mod size_constants;
@@ -29,8 +30,23 @@ fn parse_meta_command(user_input: &String, table: &mut Table) {
     }
 }
 
+fn read_path() -> String {
+    println!("Enter Database Location:");
+    let mut input = String::new();
+
+    let _ = stdout().flush();
+    stdin()
+        .read_line(&mut input)
+        .expect("An error occured reading user input");
+
+    path_parser::prepare_path(input.trim());
+
+    return String::from("");
+}
+
 fn main() {
     // TODO: Fix the file path when done
+    read_path();
     let mut internal_db = Table::open_db(String::from("app_test_file.txt"));
     loop {
         let mut input = String::new();
