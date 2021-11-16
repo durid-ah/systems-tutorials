@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use std::fs::{File, OpenOptions};
 use std::iter::Peekable;
 use std::io::{Seek, SeekFrom, Read, Write, IoSlice, Bytes};
@@ -11,7 +12,7 @@ pub struct FileManager {
 }
 
 impl FileManager {
-   pub fn new(path: String) -> FileManager {
+   pub fn new(path: PathBuf) -> FileManager {
       let mut file = OpenOptions::new()
          .read(true)
          .write(true)

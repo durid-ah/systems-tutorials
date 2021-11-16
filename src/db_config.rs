@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use std::fs::OpenOptions;
 use std::io::{Write, Read};
@@ -8,15 +9,14 @@ pub struct DBConfig {
 }
 
 impl DBConfig {
-   // TODO: Add a way to differentiate configs for different files
-   pub fn load() -> DBConfig {
+   pub fn load(path: PathBuf) -> DBConfig {
       let mut config_str = String::new();
 
       let _ = OpenOptions::new()
          .read(true)
          .write(true)
          .create(true)
-         .open("dbConfig.json")
+         .open(path)
          .unwrap()
          .read_to_string(&mut config_str);
  

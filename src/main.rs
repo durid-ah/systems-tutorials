@@ -1,3 +1,4 @@
+use std::path::{Path, PathBuf};
 use std::io::{stdin, stdout, Write};
 use std::process;
 use statement_enums::PrepareResult;
@@ -30,24 +31,32 @@ fn parse_meta_command(user_input: &String, table: &mut Table) {
     }
 }
 
-fn read_path() -> String {
-    println!("Enter Database Location:");
+fn read_path() -> (PathBuf, PathBuf) {
     let mut input = String::new();
 
-    let _ = stdout().flush();
-    stdin()
-        .read_line(&mut input)
-        .expect("An error occured reading user input");
+    loop {
+        println!("Enter Database Location:");
+        let _ = stdout().flush();
+        stdin()
+            .read_line(&mut input)
+            .expect("An error occured reading user input");
 
-    path_parser::prepare_path(input.trim());
-
-    return String::from("");
+        input = String::from(input.trim());
+        if input.len() > 0 { break; }
+    }
+    
+    return path_parser::prepare_path(input.trim());
 }
 
 fn main() {
-    // TODO: Fix the file path when done
-    read_path();
-    let mut internal_db = Table::open_db(String::from("app_test_file.txt"));
+    let (file_path, json_path) = read_path();
+
+    let file_mgr = file_manager::FileManager::new(file_path);
+    let config = db_config::DBConfig::load(json_path);
+    let pager = pager::Pager::open_pager(file_mgr, config);
+
+    let mut internal_db = Table::init_table(pager);
+
     loop {
         let mut input = String::new();
         print!("db > ");

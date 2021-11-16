@@ -19,11 +19,9 @@ pub struct Pager {
 }
 
 impl Pager {
-   pub fn open_pager(file_name: String) -> Pager {
+   pub fn open_pager(file_mgr: FileManager, config: DBConfig) -> Pager {
       let pages = Pager::init_pages();
-      let file_mgr = FileManager::new(file_name);
-      let config = DBConfig::load();
-      
+
       Pager { pages, file_mgr, config}
    }
 

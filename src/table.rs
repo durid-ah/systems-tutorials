@@ -17,8 +17,7 @@ pub struct Table {
 
 impl Table {
    /// Create the table
-   pub fn open_db(file_name: String) -> Table {
-      let pager = Pager::open_pager(file_name);
+   pub fn init_table(pager: Pager) -> Table {
       let num_rows = pager.calculate_num_rows();
 
       Table{num_rows, pager}
@@ -75,11 +74,5 @@ mod tests {
          }
          _ => assert!(false, "Unable to create row")
       }
-   }
-
-   #[test]
-   fn insert_into_table() {
-      let mut r = Table::open_db(String::from("test_file.txt"));
-      r.insert_row(&Row::new(1, "stuff", "stuff").unwrap());
    }
 }
