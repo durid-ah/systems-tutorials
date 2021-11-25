@@ -4,7 +4,8 @@ use std::path::PathBuf;
 use std::io::{stdin, stdout, Write};
 use std::process;
 use statement_enums::PrepareResult;
-use table::{Table, TableRef};
+use table::Table;
+use cursor::TableRef;
 use statement::Statement;
 use statement_handler::{
     prepare_statement,

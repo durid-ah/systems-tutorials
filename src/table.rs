@@ -1,17 +1,11 @@
-use std::rc::Rc;
-use std::cell::RefCell;
 use crate::pager::Pager;
 use crate::row::{Row, serialize_row, deserialize_row};
-use crate::size_constants::{
-   TABLE_MAX_ROWS,
-};
+use crate::size_constants::TABLE_MAX_ROWS;
 
 pub enum ExecuteResult {
    TableFull,
    Success
 }
-
-pub type TableRef = Rc<RefCell<Table>>;
 
 pub struct Table {
    pub num_rows: u64,
