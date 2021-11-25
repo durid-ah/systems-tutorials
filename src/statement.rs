@@ -5,7 +5,7 @@ use crate::table::Row;
 pub struct Statement {
    pub statement_type: StatementType,
    pub row_data: Option<Row>,
-} 
+}
 
 impl Statement {
    /// Construct a statement
