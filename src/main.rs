@@ -1,3 +1,5 @@
+use std::cell::RefCell;
+use std::rc::Rc;
 use std::path::PathBuf;
 use std::io::{stdin, stdout, Write};
 use std::process;
@@ -56,7 +58,7 @@ fn main() {
     let config = db_config::DBConfig::load(json_path);
     let pager = pager::Pager::open_pager(file_mgr, config);
 
-    let mut internal_db = Table::init_table(pager);
+    let mut internal_db = Table::init_table(pager); // Rc::new(RefCell::new(Table::init_table(pager)));
 
     loop {
         let mut input = String::new();
