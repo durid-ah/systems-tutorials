@@ -58,7 +58,7 @@ fn main() {
     let config = db_config::DBConfig::load(json_path);
     let pager = pager::Pager::open_pager(file_mgr, config);
 
-    let mut internal_db = Rc::new(RefCell::new(Table::init_table(pager)));
+    let internal_db = Rc::new(RefCell::new(Table::init_table(pager)));
 
     loop {
         let mut input = String::new();
