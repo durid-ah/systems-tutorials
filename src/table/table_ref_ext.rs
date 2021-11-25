@@ -12,6 +12,8 @@ pub trait TableRefExt {
 }
 
 impl TableRefExt for TableRef {
-   fn start_cursor(&mut self) -> Cursor { todo!() }
+   fn start_cursor(&mut self) -> Cursor {
+      todo!()
+   }
    fn end_cursor(&mut self) -> Cursor { todo!() }
 }
