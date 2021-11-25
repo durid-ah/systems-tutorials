@@ -19,6 +19,7 @@ mod table;
 mod pager;
 mod statement;
 mod row;
+mod cursor;
 
 fn parse_meta_command(user_input: &String, table: &mut Table) {
     let input = user_input.trim_end();
