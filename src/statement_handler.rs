@@ -1,7 +1,6 @@
 use crate::statement_enums::{StatementType, PrepareResult};
-use crate::table::ExecuteResult;
+use crate::table::{ExecuteResult, TableRef};
 use crate::statement::Statement;
-use crate::cursor::TableRef;
 
 /// Prcesses the incoming statement from the user
 pub fn prepare_statement(command: &String, statement: &mut Statement) -> PrepareResult {

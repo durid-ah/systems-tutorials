@@ -4,8 +4,7 @@ use std::path::PathBuf;
 use std::io::{stdin, stdout, Write};
 use std::process;
 use statement_enums::PrepareResult;
-use table::Table;
-use cursor::TableRef;
+use table::{Table, TableRef};
 use statement::Statement;
 use statement_handler::{
     prepare_statement,
@@ -22,7 +21,6 @@ mod table;
 mod pager;
 mod statement;
 mod row;
-mod cursor;
 
 fn parse_meta_command(user_input: &String, table: TableRef) {
     let input = user_input.trim_end();
