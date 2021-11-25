@@ -1,5 +1,5 @@
 use crate::statement_enums::{StatementType, PrepareResult};
-use crate::table::{Table, ExecuteResult};
+use crate::table::{ExecuteResult, TableRef};
 use crate::statement::Statement;
 
 /// Prcesses the incoming statement from the user
@@ -21,16 +21,18 @@ pub fn prepare_statement(command: &String, statement: &mut Statement) -> Prepare
 }
 
 /// Execute user statement
-pub fn execute_statement(stmt: Statement, db: &mut Table) {
+pub fn execute_statement(stmt: Statement, db: TableRef) {
    match stmt.statement_type {
       StatementType::SelectStatement => {
-         let res = db.select_rows();
+         let res = db.borrow_mut()
+            .select_rows();
+         
          for item in res {
             println!("{} - {} - {}", item.id, item.username, item.email)
          }
       },
       StatementType::InsertStatement => {
-         match db.insert_row(&stmt.row_data.unwrap()) {
+         match db.borrow_mut().insert_row(&stmt.row_data.unwrap()) {
             ExecuteResult::TableFull => println!("Insert Error: the table is full"),
             ExecuteResult::Success => println!("Insert successful")
          }

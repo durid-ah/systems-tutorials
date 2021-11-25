@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use std::io::{stdin, stdout, Write};
 use std::process;
 use statement_enums::PrepareResult;
-use table::Table;
+use table::{Table, TableRef};
 use statement::Statement;
 use statement_handler::{
     prepare_statement,
@@ -23,11 +23,11 @@ mod statement;
 mod row;
 mod cursor;
 
-fn parse_meta_command(user_input: &String, table: &mut Table) {
+fn parse_meta_command(user_input: &String, table: TableRef) {
     let input = user_input.trim_end();
     match input {
         ".exit" => {
-            table.close_table();
+            table.borrow_mut().close_table();
             process::exit(0)
         },
         _ => println!("Unrecognized Meta Command '{}'", input)
@@ -58,7 +58,7 @@ fn main() {
     let config = db_config::DBConfig::load(json_path);
     let pager = pager::Pager::open_pager(file_mgr, config);
 
-    let mut internal_db = Table::init_table(pager); // Rc::new(RefCell::new(Table::init_table(pager)));
+    let mut internal_db = Rc::new(RefCell::new(Table::init_table(pager)));
 
     loop {
         let mut input = String::new();
@@ -70,13 +70,13 @@ fn main() {
         let first_char = input.chars().next().unwrap();
 
         if first_char == '.' {
-            parse_meta_command(&input, &mut internal_db);
+            parse_meta_command(&input, Rc::clone(&internal_db));
             continue;
         }
 
         let mut stmt =  Statement::new();
         match prepare_statement(&input, &mut stmt) {
-            PrepareResult::Success => execute_statement(stmt, &mut internal_db),
+            PrepareResult::Success => execute_statement(stmt, Rc::clone(&internal_db)),
             PrepareResult::UnrecognizedStatement => println!("Unrecognized statement: \n\t{}", input.trim()),
             PrepareResult::BadStatement(err) => println!("Error: {}", err)
         }
