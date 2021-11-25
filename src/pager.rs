@@ -1,10 +1,10 @@
 use core::mem::{self, MaybeUninit};
 use std::vec::Vec;
 
-use super::file_manager::FileManager;
-use super::db_config::DBConfig;
+use crate::file_manager::FileManager;
+use crate::db_config::DBConfig;
 
-use super::size_constants::{
+use crate::size_constants::{
    ROWS_PER_PAGE,
    TABLE_MAX_PAGES,
 };
@@ -58,7 +58,7 @@ impl Pager {
             None => continue
          }
       }
-    }
+   }
 
    //TODO: change from zero indexed?
    pub fn get_row(&mut self, row_num: u64)-> &mut Option<Vec<u8>> {

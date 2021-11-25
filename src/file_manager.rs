@@ -4,7 +4,7 @@ use std::iter::Peekable;
 use std::io::{Seek, SeekFrom, Read, Write, IoSlice, Bytes};
 use std::borrow::BorrowMut;
 
-use super::size_constants::PAGE_SIZE;
+use crate::size_constants::PAGE_SIZE;
 
 pub struct FileManager {
    file: File,

@@ -1,7 +1,6 @@
 use crate::pager::Pager;
-use super::row::{Row, serialize_row, deserialize_row};
-
-use super::size_constants::{
+use crate::row::{Row, serialize_row, deserialize_row};
+use crate::size_constants::{
    TABLE_MAX_ROWS,
 };
 

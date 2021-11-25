@@ -1,7 +1,6 @@
-use super::statement_enums::{StatementType, PrepareResult};
-use super::table::{Table, ExecuteResult};
-use super::statement::Statement;
-
+use crate::statement_enums::{StatementType, PrepareResult};
+use crate::table::{Table, ExecuteResult};
+use crate::statement::Statement;
 
 /// Prcesses the incoming statement from the user
 pub fn prepare_statement(command: &String, statement: &mut Statement) -> PrepareResult {

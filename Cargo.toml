@@ -1,5 +1,5 @@
 [package]
-name = "sql-db-rust"
+name = "sql_db_rust"
 version = "0.1.0"
 authors = ["Durid Ahmad <ahmad.durid96@gmail.com>"]
 edition = "2018"
