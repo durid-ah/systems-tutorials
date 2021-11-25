@@ -1,8 +1,4 @@
-use std::cell::RefCell;
-use std::rc::Rc;
-use crate::table::Table;
-
-type TableRef = Rc<RefCell<Table>>;
+use crate::table::TableRef;
 
 pub struct Cursor {
    table: TableRef,
