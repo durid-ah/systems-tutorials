@@ -1,5 +1,5 @@
 use crate::statement_enums::{StatementType, PrepareResult};
-use crate::row::Row;
+use crate::table::Row;
 
 /// The struct containing the statement data
 pub struct Statement {

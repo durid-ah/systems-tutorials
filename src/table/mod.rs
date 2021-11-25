@@ -1,12 +1,17 @@
 pub use cursor::Cursor;
 pub use table_ref_ext::TableRef;
+pub use row::Row;
 
 use crate::pager::Pager;
-use crate::row::{Row, serialize_row, deserialize_row};
 use crate::size_constants::TABLE_MAX_ROWS;
+use row::{
+   row_util::serialize_row, 
+   row_util::deserialize_row
+};
 
 mod cursor;
 mod table_ref_ext;
+mod row;
 
 pub enum ExecuteResult {
    TableFull,

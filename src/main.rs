@@ -20,7 +20,6 @@ mod statement_enums;
 mod table;
 mod pager;
 mod statement;
-mod row;
 
 fn parse_meta_command(user_input: &String, table: TableRef) {
     let input = user_input.trim_end();

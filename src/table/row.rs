@@ -1,17 +1,6 @@
 use bincode;
 use serde::{Serialize, Deserialize};
 
-/// convert the row to a vec<u8>
-pub fn serialize_row(row: &Row) -> Vec<u8> {
-   let res = bincode::serialize(&row).expect("Unable to serialize data");
-   
-   return res;
-}
-
-pub fn deserialize_row(row: &Vec<u8>) -> Row {
-   bincode::deserialize(&row).expect("Unable to deserialize data")
-}
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Row {
    pub id: u32,
@@ -31,6 +20,21 @@ impl Row {
       }
 
       Result::Ok(Row{id, username: String::from(username), email: String::from(email)})
+   }
+}
+
+pub mod row_util {
+   use super::*;
+   
+   /// convert the row to a vec<u8>
+   pub fn serialize_row(row: &Row) -> Vec<u8> {
+      let res = bincode::serialize(&row).expect("Unable to serialize data");
+
+      return res;
+   }
+
+   pub fn deserialize_row(row: &Vec<u8>) -> Row {
+      bincode::deserialize(&row).expect("Unable to deserialize data")
    }
 }
 
