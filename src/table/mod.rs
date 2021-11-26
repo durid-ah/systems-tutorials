@@ -32,7 +32,9 @@ impl Table {
    }
 
    /// Get a reference to the row in the table based on the row number
-   pub fn get_row(&mut self, row_num: u64) -> &mut Option<Vec<u8>> { self.pager.get_row(row_num)}
+   pub fn get_row(&mut self, row_num: u64) -> &mut Option<Vec<u8>> {
+      self.pager.get_row(row_num)
+   }
 
    /// Insert the row into the next available slot
    pub fn insert_row(&mut self, row: &Row) -> ExecuteResult {

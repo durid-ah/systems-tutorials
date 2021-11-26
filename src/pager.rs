@@ -60,8 +60,8 @@ impl Pager {
       }
    }
 
-   //TODO: change from zero indexed?
    pub fn get_row(&mut self, row_num: u64)-> &mut Option<Vec<u8>> {
+      let row_num = row_num - 1;
       let page_num: usize = self.get_page_idx(row_num) as usize;
       let row_idx: usize = self.get_row_idx(row_num) as usize;
    
