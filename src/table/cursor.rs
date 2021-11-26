@@ -1,4 +1,4 @@
-use crate::Rc;
+use crate::pager::RowRef;
 use super::table_ref_ext::TableRef;
 
 pub struct Cursor {
@@ -12,9 +12,7 @@ impl Cursor {
       Cursor{row_num, table, end_of_table}
    }
 
-   pub fn get_val<'a>(&'a mut self) -> Rc<Option<&Vec<u8>>> {
-      // let mut t = self.table.borrow_mut();
-      // Rc::new(t.get_row(self.row_num).as_ref())
-      todo!()
+   pub fn get_val(&mut self) -> RowRef {
+      self.table.borrow_mut().get_row(self.row_num)
    }
 }

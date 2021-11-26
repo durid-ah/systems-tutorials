@@ -1,9 +1,8 @@
-use std::cell::RefCell;
-use std::rc::Rc;
 pub use cursor::Cursor;
 pub use table_ref_ext::TableRef;
 pub use row::Row;
 
+use crate::pager::RowRef;
 use crate::pager::Pager;
 use crate::size_constants::TABLE_MAX_ROWS;
 use row::{
@@ -34,7 +33,7 @@ impl Table {
    }
 
    /// Get a reference to the row in the table based on the row number
-   pub fn get_row(&mut self, row_num: u64) ->  Rc<RefCell<&mut Option<Vec<u8>>>> {
+   pub fn get_row(&mut self, row_num: u64) -> RowRef {
       self.pager.get_row(row_num)
    }
 
@@ -48,9 +47,7 @@ impl Table {
       let table_row = self.get_row(self.num_rows + 1);
       let mut row = table_row.borrow_mut();
 
-      **row = Some(bin_row);
-      drop(row);
-      
+      *row = Some(bin_row);
       self.num_rows += 1;
       
       ExecuteResult::Success

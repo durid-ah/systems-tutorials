@@ -11,8 +11,9 @@ use crate::size_constants::{
    TABLE_MAX_PAGES,
 };
 
-type Page = [Option<Vec<u8>>; ROWS_PER_PAGE as usize];
-type UninitPage = [MaybeUninit<Option<Vec<u8>>>; ROWS_PER_PAGE as usize];
+pub type RowRef = Rc<RefCell<Option<Vec<u8>>>>; 
+type Page = [RowRef; ROWS_PER_PAGE as usize];
+type UninitPage = [MaybeUninit<RowRef>; ROWS_PER_PAGE as usize];
 
 pub struct Pager {
    file_mgr: FileManager,
@@ -53,8 +54,9 @@ impl Pager {
       
       let _ = file_mgr.seek_to_page(page_num);
 
-      for i in 0..(ROWS_PER_PAGE as usize) {         
-         match page_to_write[i].as_ref() {
+      for i in 0..(ROWS_PER_PAGE as usize) {   
+         let page_to_write = page_to_write[i].borrow();       
+         match &*page_to_write {
             Some(unwrapped_row) =>
                file_mgr.write_row(unwrapped_row, unwrapped_row.len() as u16),
             None => continue
@@ -62,7 +64,7 @@ impl Pager {
       }
    }
 
-   pub fn get_row(&mut self, row_num: u64)-> Rc<RefCell<&mut Option<Vec<u8>>>> {
+   pub fn get_row(&mut self, row_num: u64)-> RowRef {
       let row_num = row_num - 1;
       let page_num: usize = self.get_page_idx(row_num) as usize;
       let row_idx: usize = self.get_row_idx(row_num) as usize;
@@ -75,7 +77,7 @@ impl Pager {
       }
 
       let res = page.as_mut().unwrap();
-      Rc::new(RefCell::new(&mut res[row_idx]))
+      res[row_idx].clone()
    }
 
    /// Initialize each page to Option::None
@@ -110,7 +112,7 @@ impl Pager {
          };
 
          for r in &mut _init_page[..] {
-            let row = file_mgr.read_row();
+            let row = Rc::new(RefCell::new(file_mgr.read_row()));
             *r = MaybeUninit::new(row);
          }
          
