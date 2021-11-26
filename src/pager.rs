@@ -1,3 +1,5 @@
+use std::cell::RefCell;
+use std::rc::Rc;
 use core::mem::{self, MaybeUninit};
 use std::vec::Vec;
 
@@ -60,7 +62,7 @@ impl Pager {
       }
    }
 
-   pub fn get_row(&mut self, row_num: u64)-> &mut Option<Vec<u8>> {
+   pub fn get_row(&mut self, row_num: u64)-> Rc<RefCell<&mut Option<Vec<u8>>>> {
       let row_num = row_num - 1;
       let page_num: usize = self.get_page_idx(row_num) as usize;
       let row_idx: usize = self.get_row_idx(row_num) as usize;
@@ -73,7 +75,7 @@ impl Pager {
       }
 
       let res = page.as_mut().unwrap();
-      &mut res[row_idx]
+      Rc::new(RefCell::new(&mut res[row_idx]))
    }
 
    /// Initialize each page to Option::None
