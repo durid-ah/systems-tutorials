@@ -13,7 +13,10 @@ pub trait TableRefExt {
 
 impl TableRefExt for TableRef {
    fn start_cursor(&mut self) -> Cursor {
-      Cursor::new(0, self.clone(), self.borrow().num_rows == 0)
+      Cursor::new(1, self.clone(), self.borrow().num_rows == 0)
    }
-   fn end_cursor(&mut self) -> Cursor { todo!() }
+   
+   fn end_cursor(&mut self) -> Cursor {
+      Cursor::new(self.borrow().num_rows + 1, self.clone(), true)
+   }
 }
