@@ -1,14 +1,9 @@
 pub use cursor::Cursor;
-pub use table_ref_ext::TableRef;
-pub use row::Row;
+pub use table_ref_ext::{TableRef, TableRefExt};
+pub use row::{Row, row_util};
 
 use crate::pager::RowRef;
 use crate::pager::Pager;
-use crate::size_constants::TABLE_MAX_ROWS;
-use row::{
-   row_util::serialize_row, 
-   row_util::deserialize_row
-};
 
 mod cursor;
 mod table_ref_ext;
@@ -35,38 +30,6 @@ impl Table {
    /// Get a reference to the row in the table based on the row number
    pub fn get_row(&mut self, row_num: u64) -> RowRef {
       self.pager.get_row(row_num)
-   }
-
-   /// Insert the row into the next available slot
-   pub fn insert_row(&mut self, row: &Row) -> ExecuteResult {
-      if self.num_rows >= TABLE_MAX_ROWS {
-         return ExecuteResult::TableFull;
-      }
-
-      let bin_row = serialize_row(row);
-      let table_row = self.get_row(self.num_rows + 1);
-      let mut row = table_row.borrow_mut();
-
-      *row = Some(bin_row);
-      self.num_rows += 1;
-      
-      ExecuteResult::Success
-   }
-
-   pub fn select_rows(&mut self) -> Vec<Row> {
-      let mut res: Vec<Row> = Vec::new();
-      for i in 1..(self.num_rows + 1) {
-         let row_ref = self.get_row(i);
-         let borrowed_row = row_ref.borrow();
-         let r = borrowed_row.as_ref();
-
-         if let Option::Some(row) = r {
-            let deserialized_r = deserialize_row(&row);
-            res.push(deserialized_r);            
-         }
-      }
-
-      res
    }
 
    pub fn close_table(&mut self) {

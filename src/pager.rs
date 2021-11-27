@@ -7,9 +7,7 @@ use crate::file_manager::FileManager;
 use crate::db_config::DBConfig;
 
 use crate::size_constants::{
-   ROWS_PER_PAGE,
-   TABLE_MAX_PAGES,
-};
+   ROWS_PER_PAGE, TABLE_MAX_PAGES };
 
 pub type RowRef = Rc<RefCell<Option<Vec<u8>>>>; 
 type Page = [RowRef; ROWS_PER_PAGE as usize];

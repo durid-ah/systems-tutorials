@@ -1,13 +1,15 @@
-use crate::table::{ExecuteResult, TableRef};
 use crate::statement::Statement;
+use crate::table::{
+   TableRefExt, Row, row_util, ExecuteResult, TableRef, Cursor };
 use crate::statement_enums::{
-   StatementType, PrepareResult
-};
+   StatementType, PrepareResult };
+
+use crate::size_constants::TABLE_MAX_ROWS;
 
 /// Prcesses the incoming statement from the user
 pub fn prepare_statement(command: &String, statement: &mut Statement) -> PrepareResult {
    let split_input: Vec<&str> = command.trim().split(" ").collect();
-   
+
    let operation = split_input[0];
    match operation {
       "select" => {
@@ -23,24 +25,55 @@ pub fn prepare_statement(command: &String, statement: &mut Statement) -> Prepare
 }
 
 /// Execute user statement
-pub fn execute_statement(stmt: Statement, db: TableRef) {
+pub fn execute_statement(stmt: Statement,mut db: TableRef) {
    match stmt.statement_type {
       StatementType::SelectStatement => {
-         let res = db.borrow_mut()
-            .select_rows();
-         
+         let cursor = db.start_cursor();
+         let res = select_rows(cursor);
+
          for item in res {
             println!("{} - {} - {}", item.id, item.username, item.email)
          }
       },
       StatementType::InsertStatement => {
-         match db.borrow_mut().insert_row(&stmt.row_data.unwrap()) {
+         let cursor = db.end_cursor();
+         match insert_row(cursor, &stmt.row_data.unwrap()) {
             ExecuteResult::TableFull => println!("Insert Error: the table is full"),
             ExecuteResult::Success => println!("Insert successful")
          }
       },
       StatementType::None => println!("Unrecognized Statement"),
    }
+}
+
+pub fn select_rows(mut cursor: Cursor) -> Vec<Row> {
+   let mut res: Vec<Row> = Vec::new();
+   while !cursor.end_of_table {
+      let row_ref = cursor.get_val();
+      let borrowed_row = row_ref.borrow();
+      let r = borrowed_row.as_ref();
+
+      if let Option::Some(row) = r {
+         let deserialized_r = row_util::deserialize_row(&row);
+         res.push(deserialized_r);
+      }
+
+      cursor.advance();
+   }
+
+   res
+}
+
+/// Insert the row into the next available slot
+pub fn insert_row(mut cursor: Cursor, row: &Row) -> ExecuteResult {
+   if cursor.row_num >= TABLE_MAX_ROWS {
+      return ExecuteResult::TableFull;
+   }
+
+   let bin_row = row_util::serialize_row(row);
+   cursor.set_val(bin_row);
+
+   ExecuteResult::Success
 }
 
 
@@ -55,12 +88,12 @@ mod tests {
       Success,
       UnrecognizedStatement
    };
-   
+
    #[test]
    fn test_incorrect_stmt() {
       let stmt_string = String::from("selec");
       let mut stmt = Statement::new();
-      
+
       match prepare_statement(&stmt_string, &mut stmt) {
          UnrecognizedStatement => assert!(true),
          _ => assert!(false, "a short statement must return unrecognized statement")
@@ -76,7 +109,7 @@ mod tests {
    fn test_select_stmt() {
       let stmt_string = String::from("select");
       let mut stmt = Statement::new();
-      
+
       match prepare_statement(&stmt_string, &mut stmt) {
          Success => assert!(true),
          _ => assert!(false, "must return success")
@@ -92,7 +125,7 @@ mod tests {
    fn test_insert_stmt() {
       let stmt_string = String::from("insert 1 stuff morestuff");
       let mut stmt = Statement::new();
-      
+
       match prepare_statement(&stmt_string, &mut stmt) {
          Success => assert!(true),
          _ => assert!(false, "the insert statement must return success")
@@ -113,7 +146,7 @@ mod tests {
    fn test_bad_insert_stmt() {
       let stmt_string = String::from("insert 1 stuff");
       let mut stmt = Statement::new();
-      
+
       match prepare_statement(&stmt_string, &mut stmt) {
          UnrecognizedStatement => assert!(true),
          _ => assert!(false, "a short statement must return success")
@@ -123,7 +156,7 @@ mod tests {
          StatementType::InsertStatement => assert!(true),
          _ => assert!(false, "Wrong statement type")
       }
-      
+
       match stmt.row_data {
          None => assert!(true),
          _ => assert!(false, "The row should not have been parsed")

@@ -15,4 +15,19 @@ impl Cursor {
    pub fn get_val(&mut self) -> RowRef {
       self.table.borrow_mut().get_row(self.row_num)
    }
+
+   pub fn set_val(&mut self, bin_row: Vec<u8>) {
+      let table_row = self.table.borrow_mut().get_row(self.row_num);
+      let mut row = table_row.borrow_mut();
+      *row = Some(bin_row);
+      self.table.borrow_mut().num_rows += 1;   
+   }
+
+   pub fn advance(&mut self) {
+      if !self.end_of_table {
+         self.row_num += 1;
+         self.end_of_table = 
+            self.row_num >= self.table.borrow().num_rows;
+      }
+   }
 }
