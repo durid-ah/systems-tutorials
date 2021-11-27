@@ -45,7 +45,7 @@ fn read_path() -> (PathBuf, PathBuf) {
         input = String::from(input.trim());
         if input.len() > 0 { break; }
     }
-    
+
     return path_parser::prepare_path(input.trim());
 }
 
@@ -78,5 +78,5 @@ fn main() {
             PrepareResult::UnrecognizedStatement => println!("Unrecognized statement: \n\t{}", input.trim()),
             PrepareResult::BadStatement(err) => println!("Error: {}", err)
         }
-    }    
+    }
 }

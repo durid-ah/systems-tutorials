@@ -20,7 +20,7 @@ impl DBConfig {
          .open(&path)
          .unwrap()
          .read_to_string(&mut config_str);
- 
+
       if config_str.len() == 0 {
          return DBConfig{num_rows: 0, path}
       }

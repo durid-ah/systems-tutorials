@@ -9,7 +9,7 @@ use crate::db_config::DBConfig;
 use crate::size_constants::{
    ROWS_PER_PAGE, TABLE_MAX_PAGES };
 
-pub type RowRef = Rc<RefCell<Option<Vec<u8>>>>; 
+pub type RowRef = Rc<RefCell<Option<Vec<u8>>>>;
 type Page = [RowRef; ROWS_PER_PAGE as usize];
 type UninitPage = [MaybeUninit<RowRef>; ROWS_PER_PAGE as usize];
 
@@ -49,11 +49,11 @@ impl Pager {
 
    fn flush_page(page: &Option<Page>, page_num: u64, file_mgr: &mut FileManager) {
       let page_to_write = page.as_ref().expect("Attempting To Flush None Page");
-      
+
       let _ = file_mgr.seek_to_page(page_num);
 
-      for i in 0..(ROWS_PER_PAGE as usize) {   
-         let page_to_write = page_to_write[i].borrow();       
+      for i in 0..(ROWS_PER_PAGE as usize) {
+         let page_to_write = page_to_write[i].borrow();
          match &*page_to_write {
             Some(unwrapped_row) =>
                file_mgr.write_row(unwrapped_row, unwrapped_row.len() as u16),
@@ -66,7 +66,7 @@ impl Pager {
       let row_num = row_num - 1;
       let page_num: usize = self.get_page_idx(row_num) as usize;
       let row_idx: usize = self.get_row_idx(row_num) as usize;
-   
+
       let page = &mut self.pages[page_num];
 
       if let Option::None =  page {
@@ -89,7 +89,7 @@ impl Pager {
          // set each page to Option::None
          for elem in &mut _pages[..] {
             *elem = MaybeUninit::new(Option::None);
-         } 
+         }
 
          //remove the MaybeUninit part of the type to make it a an option array
          unsafe { mem::transmute::<_, [Option<Page>; TABLE_MAX_PAGES as usize]>(_pages)}
@@ -98,10 +98,10 @@ impl Pager {
 
    /// Return the index of the page where the row number resides
    fn get_page_idx(&self, row_num: u64) -> u64 { return row_num / ROWS_PER_PAGE}
-   
+
    /// Get the row within the page where the row resides
    fn get_row_idx(&self, row_num: u64) -> u64 { return row_num % ROWS_PER_PAGE }
-   
+
    /// Init the rows of the page to Option::None
    fn init_page_rows(page: &mut Option<Page>, file_mgr: &mut FileManager) {
       let mut _page: Page = {
@@ -113,7 +113,7 @@ impl Pager {
             let row = Rc::new(RefCell::new(file_mgr.read_row()));
             *r = MaybeUninit::new(row);
          }
-         
+
          unsafe {mem::transmute(_init_page)}
       };
 

@@ -76,7 +76,6 @@ pub fn insert_row(mut cursor: Cursor, row: &Row) -> ExecuteResult {
    ExecuteResult::Success
 }
 
-
 /////////////////////////////////
 /// Test Section
 /////////////////////////////////
