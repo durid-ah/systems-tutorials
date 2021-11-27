@@ -7,8 +7,7 @@ use statement_enums::PrepareResult;
 use table::{Table, TableRef};
 use statement::Statement;
 use statement_handler::{
-    prepare_statement,
-    execute_statement,
+    prepare_statement, execute_statement
 };
 
 mod path_parser;
