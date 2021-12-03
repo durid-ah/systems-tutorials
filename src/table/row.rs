@@ -1,6 +1,11 @@
 use bincode;
 use serde::{Serialize, Deserialize};
 
+/// Row: The structured representation of a db row
+/// Sizes:
+/// id -> 32 bytes
+/// username -> 21 bytes for overhead + 1 ~ 4 bytes depending
+///   on character type (UTF-8) 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Row {
    pub id: u32,
