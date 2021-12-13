@@ -10,6 +10,7 @@ use statement_handler::{
     prepare_statement, execute_statement
 };
 
+mod btree;
 mod path_parser;
 mod file_manager;
 mod db_config;
